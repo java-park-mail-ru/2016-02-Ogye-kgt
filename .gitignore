@@ -1,5 +1,5 @@
 *.class
-
+#/target
 # idea metadata
 .idea
 

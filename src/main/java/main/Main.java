@@ -1,23 +1,33 @@
 package main;
 
-import frontend.Frontend;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.glassfish.jersey.servlet.ServletContainer;
 
 /**
- * @author v.chibrikov
+ * @author esin88
  */
 public class Main {
+    @SuppressWarnings("OverlyBroadThrowsClause")
     public static void main(String[] args) throws Exception {
-        Frontend frontend = new Frontend();
+        int port = -1;
+        if (args.length == 1) {
+            port = Integer.valueOf(args[0]);
+        } else {
+            System.err.println("Specify port");
+            System.exit(1);
+        }
 
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.addServlet(new ServletHolder(frontend), "/authform");
+        System.out.append("Starting at port: ").append(String.valueOf(port)).append('\n');
 
-        Server server = new Server(8080);
-        server.setHandler(context);
+        final Server server = new Server(port);
+        final ServletContextHandler contextHandler = new ServletContextHandler(server, "/api/", ServletContextHandler.SESSIONS);
 
+        final ServletHolder servletHolder = new ServletHolder(ServletContainer.class);
+        servletHolder.setInitParameter("javax.ws.rs.Application","main.RestApplication");
+
+        contextHandler.addServlet(servletHolder, "/*");
         server.start();
         server.join();
     }
