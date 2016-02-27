@@ -3,6 +3,8 @@ package rest;
 import main.AccountService;
 
 import javax.inject.Singleton;
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -54,6 +56,22 @@ public class Users {
             return Response.status(Response.Status.FORBIDDEN).build();
         }else {
             return Response.status(Response.Status.OK).entity(user).build();
+        }
+    }
+
+    @DELETE
+    @Path("{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteUserById(@PathParam("id") long id) {
+        final JsonObject result;
+        if(accountService.removeUser(id)) {
+            result = Json.createObjectBuilder().build();
+            return  Response.status(Response.Status.OK).entity(result).build();
+        } else {
+            result = Json.createObjectBuilder()
+                    .add("status", 403)
+                    .add("message", "чужой пользователь").build();
+            return  Response.status(Response.Status.FORBIDDEN).entity(result).build();
         }
     }
 
