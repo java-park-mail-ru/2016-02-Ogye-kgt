@@ -31,17 +31,15 @@ public class Users {
         return Response.status(Response.Status.OK).entity(allUsers.toArray(new UserProfile[allUsers.size()])).build();
     }
 
-    // TODO: создание пользователя.
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createUser(UserProfile user, @Context HttpHeaders headers){
+    public Response createUser(UserProfile user, @Context HttpHeaders headers) {
         user.setId();
-        if(accountService.addUser(user)){
-
-            final String result = "{\"id\":" + user.getId() + '}';
-            final Id id = new Id(user.getId());
-            return Response.status(Response.Status.OK).entity(id).build();
+        if (accountService.addUser(user)) {
+            final JsonObject result = Json.createObjectBuilder()
+                    .add("id", user.getId()).build();
+            return Response.status(Response.Status.OK).entity(result).build();
         } else {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
@@ -50,12 +48,17 @@ public class Users {
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUserByName(@PathParam("id") long id) {
+    public Response getUserById(@PathParam("id") long id) {
         final UserProfile user = accountService.getUser(id);
-        if(user == null){
+        if (user == null) {
             return Response.status(Response.Status.FORBIDDEN).build();
-        }else {
-            return Response.status(Response.Status.OK).entity(user).build();
+        } else {
+            final JsonObject result = Json.createObjectBuilder()
+                    .add("id", id)
+                    .add("login", user.getLogin())
+                    .add("email", user.getEmail())
+                    .build();
+            return Response.status(Response.Status.OK).entity(result).build();
         }
     }
 
@@ -64,14 +67,14 @@ public class Users {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteUserById(@PathParam("id") long id) {
         final JsonObject result;
-        if(accountService.removeUser(id)) {
+        if (accountService.removeUser(id)) {
             result = Json.createObjectBuilder().build();
-            return  Response.status(Response.Status.OK).entity(result).build();
+            return Response.status(Response.Status.OK).entity(result).build();
         } else {
             result = Json.createObjectBuilder()
                     .add("status", 403)
                     .add("message", "чужой пользователь").build();
-            return  Response.status(Response.Status.FORBIDDEN).entity(result).build();
+            return Response.status(Response.Status.FORBIDDEN).entity(result).build();
         }
     }
 
