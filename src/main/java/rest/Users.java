@@ -21,7 +21,7 @@ public class Users {
     public Users(AccountService accountService) {
         this.accountService = accountService;
     }
-    // TODO: не нужен.
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsers() {
@@ -34,8 +34,10 @@ public class Users {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createUser(UserProfile user, @Context HttpHeaders headers){
-        if(accountService.addUser(user.getLogin(), user)){
-            final String result = "id:" + user.getId();
+        user.setId();
+        if(accountService.addUser(user)){
+
+            final String result = "{\"id\":" + user.getId() + '}';
             final Id id = new Id(user.getId());
             return Response.status(Response.Status.OK).entity(id).build();
         } else {
@@ -44,14 +46,16 @@ public class Users {
     }
 
     @GET
-    @Path("{name}")
+    @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUserByName(@PathParam("name") String name) {
-        final UserProfile user = accountService.getUser(name);
+    public Response getUserByName(@PathParam("id") long id) {
+        final UserProfile user = accountService.getUser(id);
         if(user == null){
             return Response.status(Response.Status.FORBIDDEN).build();
         }else {
             return Response.status(Response.Status.OK).entity(user).build();
         }
     }
+
+
 }

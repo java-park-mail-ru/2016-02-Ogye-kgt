@@ -21,14 +21,19 @@ public class UserProfile {
         login = "";
         password = "";
         email = "";
-        id = ID_GENETATOR.getAndIncrement();
+        setId();
     }
 
     public UserProfile(@NotNull String login, @NotNull String password, @NotNull String email) {
         this.login = login;
         this.password = password;
         this.email = email;
-        this.id = ID_GENETATOR.getAndIncrement();
+        setId();
+    }
+
+    public void setId() {
+//        id = ID_GENETATOR.getAndIncrement();
+        this.id = login.hashCode();
     }
 
     @NotNull
@@ -60,26 +65,6 @@ public class UserProfile {
 
     public long getId() {
         return id;
-    }
-
-    public class Resp {
-        private long id;
-
-        public Resp(long id) {
-            this.id = id;
-        }
-
-        public long getId() {
-            return id;
-        }
-
-        public void setId(long id) {
-            this.id = id;
-        }
-    }
-
-    public Resp getResponse() {
-        return new Resp(id);
     }
 
 }

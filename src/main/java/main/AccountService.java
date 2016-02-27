@@ -1,5 +1,6 @@
 package main;
 
+import org.eclipse.jetty.server.Authentication;
 import rest.UserProfile;
 
 import java.util.Collection;
@@ -11,25 +12,33 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author esin88
  */
 public class AccountService {
-    private Map<String, UserProfile> users = new ConcurrentHashMap<>();
+    private Map<Long, UserProfile> users = new ConcurrentHashMap<>();
 
     public AccountService() {
-        users.put("admin", new UserProfile("admin", "admin", "admin@mail.ru"));
-        users.put("guest", new UserProfile("guest", "12345", "guest@mail.ru"));
+        addUser(new UserProfile("admin", "admin", "admin@mail.ru"));
+        addUser(new UserProfile("guest", "12345", "guest@mail.ru"));
     }
 
     public Collection<UserProfile> getAllUsers() {
         return users.values();
     }
 
-    public boolean addUser(String userName, UserProfile userProfile) {
-        if (users.containsKey(userName))
+    public boolean addUser(UserProfile userProfile) {
+        final long userId = userProfile.getId();
+        if (users.containsKey(userId))
             return false;
-        users.put(userName, userProfile);
+        users.put(userProfile.getId(), userProfile);
         return true;
     }
 
-    public UserProfile getUser(String userName) {
-        return users.get(userName);
+    public UserProfile getUser(long userId) {
+        return users.get(userId);
+    }
+
+    public boolean removeUser(long userId) {
+        if (!users.containsKey(userId))
+            return false;
+        users.remove(userId);
+        return true;
     }
 }
