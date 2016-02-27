@@ -5,16 +5,17 @@ import rest.UserProfile;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author esin88
  */
 public class AccountService {
-    private Map<String, UserProfile> users = new HashMap<>();
+    private Map<String, UserProfile> users = new ConcurrentHashMap<>();
 
     public AccountService() {
-        users.put("admin", new UserProfile("admin", "admin"));
-        users.put("guest", new UserProfile("guest", "12345"));
+        users.put("admin", new UserProfile("admin", "admin", "admin@mail.ru"));
+        users.put("guest", new UserProfile("guest", "12345", "guest@mail.ru"));
     }
 
     public Collection<UserProfile> getAllUsers() {

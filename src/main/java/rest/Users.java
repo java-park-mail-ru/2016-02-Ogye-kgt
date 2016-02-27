@@ -21,12 +21,26 @@ public class Users {
     public Users(AccountService accountService) {
         this.accountService = accountService;
     }
-
+    // TODO: не нужен.
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsers() {
         final Collection<UserProfile> allUsers = accountService.getAllUsers();
         return Response.status(Response.Status.OK).entity(allUsers.toArray(new UserProfile[allUsers.size()])).build();
+    }
+
+    // TODO: создание пользователя.
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createUser(UserProfile user, @Context HttpHeaders headers){
+        if(accountService.addUser(user.getLogin(), user)){
+            final String result = "id:" + user.getId();
+            final Id id = new Id(user.getId());
+            return Response.status(Response.Status.OK).entity(id).build();
+        } else {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
     }
 
     @GET
@@ -38,17 +52,6 @@ public class Users {
             return Response.status(Response.Status.FORBIDDEN).build();
         }else {
             return Response.status(Response.Status.OK).entity(user).build();
-        }
-    }
-
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response createUser(UserProfile user, @Context HttpHeaders headers){
-        if(accountService.addUser(user.getLogin(), user)){
-            return Response.status(Response.Status.OK).entity(user.getLogin()).build();
-        } else {
-            return Response.status(Response.Status.FORBIDDEN).build();
         }
     }
 }
