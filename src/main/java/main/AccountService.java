@@ -1,10 +1,8 @@
 package main;
 
-import org.eclipse.jetty.server.Authentication;
 import rest.UserProfile;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
