@@ -31,11 +31,6 @@ public class UserProfile {
         setId();
     }
 
-    public void setId() {
-//        id = ID_GENETATOR.getAndIncrement();
-        this.id = login.hashCode();
-    }
-
     @NotNull
     public String getLogin() {
         return login;
@@ -67,4 +62,11 @@ public class UserProfile {
         return id;
     }
 
+    public void setId() {
+        this.id = email.hashCode();
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 }

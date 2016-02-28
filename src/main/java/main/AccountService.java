@@ -39,4 +39,14 @@ public class AccountService {
         users.remove(userId);
         return true;
     }
+
+    public boolean updateUser(long userId, UserProfile newProfile) {
+        if (!users.containsKey(userId))
+            return false;
+        final UserProfile userProfile = users.get(userId);
+        userProfile.setLogin(newProfile.getLogin());
+        userProfile.setPassword(newProfile.getPassword());
+        users.replace(userId, userProfile);
+        return true;
+    }
 }

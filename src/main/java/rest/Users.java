@@ -66,15 +66,25 @@ public class Users {
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteUserById(@PathParam("id") long id) {
-        final JsonObject result;
         if (accountService.removeUser(id)) {
-            result = Json.createObjectBuilder().build();
+            return Response.status(Response.Status.OK).entity(Json.createObjectBuilder().build()).build();
+        } else {
+            return Response.status(Response.Status.FORBIDDEN).entity(new ForbiddenResponse()).build();
+        }
+    }
+
+    @PUT
+    @Path("{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateUser(@PathParam("id") long id, UserProfile userProfile) {
+        if (accountService.updateUser(id, userProfile)) {
+            final JsonObject result = Json.createObjectBuilder()
+                    .add("id", id)
+                    .build();
             return Response.status(Response.Status.OK).entity(result).build();
         } else {
-            result = Json.createObjectBuilder()
-                    .add("status", 403)
-                    .add("message", "чужой пользователь").build();
-            return Response.status(Response.Status.FORBIDDEN).entity(result).build();
+            return Response.status(Response.Status.OK).entity(new ForbiddenResponse()).build();
         }
     }
 
