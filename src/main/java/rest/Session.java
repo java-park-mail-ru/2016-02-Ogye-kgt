@@ -4,6 +4,7 @@ import main.AccountService;
 
 import javax.inject.Singleton;
 import javax.json.Json;
+import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -29,7 +30,11 @@ public class Session {
     @Produces(MediaType.APPLICATION_JSON)
     public Response checkAuth(@Context HttpServletRequest request) {
         // TODO
-        return Response.status(Response.Status.OK).entity(Json.createObjectBuilder().add("session", request.getSession().getId()).build()).build();
+        final String sessionId = request.getSession().getId();
+        final JsonObject result = Json.createObjectBuilder()
+                .add("session", sessionId)
+                .build();
+        return Response.status(Response.Status.OK).entity(result).build();
 //        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
     }
 
