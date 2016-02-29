@@ -6,10 +6,7 @@ import javax.inject.Singleton;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -41,6 +38,13 @@ public class Session {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response userLogin() {
+        // TODO
+        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+    }
+
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response userLogout() {
         // TODO
         return Response.status(Response.Status.NOT_IMPLEMENTED).build();
     }
