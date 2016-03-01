@@ -48,7 +48,7 @@ public class Session {
             result = Json.createObjectBuilder()
                     .add("id", userId)
                     .build();
-            Response.status(Response.Status.OK).entity(result).build();
+            return Response.status(Response.Status.OK).entity(result).build();
         }
         return Response.status(Response.Status.NOT_FOUND).entity(result).build();
     }
