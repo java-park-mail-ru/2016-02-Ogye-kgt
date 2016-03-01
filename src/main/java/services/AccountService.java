@@ -6,9 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * @author esin88
- */
+
 public class AccountService {
     private Map<Long, UserProfile> users = new ConcurrentHashMap<>();
 
@@ -23,8 +21,8 @@ public class AccountService {
 
     public boolean addUser(UserProfile userProfile) {
         final long userId = userProfile.getId();
-        if (users.containsKey(userId))
-            return false;
+
+        if (isUserExist(userProfile)) return false;
         users.put(userProfile.getId(), userProfile);
         return true;
     }
@@ -48,5 +46,14 @@ public class AccountService {
         userProfile.setPassword(newProfile.getPassword());
         users.replace(userId, userProfile);
         return true;
+    }
+
+    public boolean isUserExist(UserProfile userProfile) {
+        final String login = userProfile.getLogin();
+        for (UserProfile curUserProfile : users.values()) {
+            if (curUserProfile.getLogin().equals(login)) return true;
+        }
+
+        return false;
     }
 }

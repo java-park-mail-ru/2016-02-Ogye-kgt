@@ -3,6 +3,7 @@ package rest;
 import services.AccountService;
 import models.ForbiddenResponse;
 import models.UserProfile;
+import services.AuthenticationService;
 
 import javax.inject.Singleton;
 import javax.json.Json;
@@ -14,16 +15,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
 
-/**
- * Created by e.shubin on 25.02.2016.
- */
+
 @Singleton
 @Path("/user")
 public class Users {
     private AccountService accountService;
+    private AuthenticationService authService;
 
-    public Users(AccountService accountService) {
+    public Users(AccountService accountService, AuthenticationService authService) {
         this.accountService = accountService;
+        this.authService = authService;
     }
 
     @GET
@@ -43,7 +44,10 @@ public class Users {
                     .add("id", user.getId()).build();
             return Response.status(Response.Status.OK).entity(result).build();
         } else {
-            return Response.status(Response.Status.FORBIDDEN).build();
+            final JsonObject result = Json.createObjectBuilder()
+                    .add("message", "login exist")
+                    .build();
+            return Response.status(Response.Status.FORBIDDEN).entity(result).build();
         }
     }
 

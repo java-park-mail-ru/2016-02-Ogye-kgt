@@ -1,8 +1,6 @@
 package models;
 
-/**
- * Created by gantz on 27.02.16.
- */
+
 public class ForbiddenResponse {
     public static final int STATUS = 403;
     private int status;

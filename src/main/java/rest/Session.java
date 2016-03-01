@@ -1,6 +1,8 @@
 package rest;
 
+import models.UserLoginRequest;
 import services.AccountService;
+import services.AuthenticationService;
 
 import javax.inject.Singleton;
 import javax.json.Json;
@@ -11,16 +13,16 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-/**
- * Created by gantz on 28.02.16.
- */
+
 @Singleton
 @Path("/session")
 public class Session {
     private AccountService accountService;
+    private AuthenticationService authenticationService;
 
-    public Session(AccountService accountService) {
+    public Session(AccountService accountService, AuthenticationService authenticationService) {
         this.accountService = accountService;
+        this.authenticationService = authenticationService;
     }
 
     @GET
@@ -36,10 +38,12 @@ public class Session {
     }
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response userLogin() {
+    public Response userLogin(UserLoginRequest userLoginRequest, @Context HttpServletRequest request) {
+        final String sessionId = request.getSession().getId();
         // TODO
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return Response.status(Response.Status.NOT_IMPLEMENTED).entity(userLoginRequest).build();
     }
 
     @DELETE
