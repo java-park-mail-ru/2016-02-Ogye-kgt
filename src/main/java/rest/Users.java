@@ -1,13 +1,13 @@
 package rest;
 
-import services.AccountService;
 import models.ForbiddenResponse;
 import models.UserProfile;
-import services.AuthenticationService;
+import services.AccountService;
 
 import javax.inject.Singleton;
 import javax.json.Json;
 import javax.json.JsonObject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -20,11 +20,9 @@ import java.util.Collection;
 @Path("/user")
 public class Users {
     private AccountService accountService;
-    private AuthenticationService authService;
 
-    public Users(AccountService accountService, AuthenticationService authService) {
+    public Users(AccountService accountService) {
         this.accountService = accountService;
-        this.authService = authService;
     }
 
     @GET
@@ -71,8 +69,9 @@ public class Users {
     @DELETE
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteUserById(@PathParam("id") long id) {
-        if (accountService.removeUser(id)) {
+    public Response deleteUserById(@PathParam("id") long id, @Context HttpServletRequest request) {
+        final String sessionId = request.getSession().getId();
+        if (accountService.isUserMatch(sessionId, id) && accountService.removeUser(id)) {
             return Response.status(Response.Status.OK).entity(Json.createObjectBuilder().build()).build();
         } else {
             return Response.status(Response.Status.FORBIDDEN).entity(new ForbiddenResponse()).build();
@@ -83,14 +82,15 @@ public class Users {
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUser(@PathParam("id") long id, UserProfile userProfile) {
-        if (accountService.updateUser(id, userProfile)) {
+    public Response updateUser(@PathParam("id") long id, UserProfile userProfile, @Context HttpServletRequest request) {
+        final String sessionId = request.getSession().getId();
+        if (accountService.isUserMatch(sessionId, id) && accountService.updateUser(id, userProfile)) {
             final JsonObject result = Json.createObjectBuilder()
                     .add("id", id)
                     .build();
             return Response.status(Response.Status.OK).entity(result).build();
         } else {
-            return Response.status(Response.Status.OK).entity(new ForbiddenResponse()).build();
+            return Response.status(Response.Status.FORBIDDEN).entity(new ForbiddenResponse()).build();
         }
     }
 

@@ -2,7 +2,6 @@ package rest;
 
 import models.UserLoginRequest;
 import services.AccountService;
-import services.AuthenticationService;
 
 import javax.inject.Singleton;
 import javax.json.Json;
@@ -18,39 +17,49 @@ import javax.ws.rs.core.Response;
 @Path("/session")
 public class Session {
     private AccountService accountService;
-    private AuthenticationService authenticationService;
 
-    public Session(AccountService accountService, AuthenticationService authenticationService) {
+    public Session(AccountService accountService) {
         this.accountService = accountService;
-        this.authenticationService = authenticationService;
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response checkAuth(@Context HttpServletRequest request) {
-        // TODO
         final String sessionId = request.getSession().getId();
-        final JsonObject result = Json.createObjectBuilder()
-                .add("session", sessionId)
-                .build();
-        return Response.status(Response.Status.NOT_IMPLEMENTED).entity(result).build();
-//        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        JsonObject result = Json.createObjectBuilder().build();
+        if (accountService.isAuthorised(sessionId)) {
+            result = Json.createObjectBuilder()
+                    .add("id", accountService.getUserBySession(sessionId).getId())
+                    .build();
+            return Response.status(Response.Status.OK).entity(result).build();
+        }
+        return Response.status(Response.Status.UNAUTHORIZED).entity(result).build();
     }
 
-    @POST
+    @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response userLogin(UserLoginRequest userLoginRequest, @Context HttpServletRequest request) {
+        JsonObject result = Json.createObjectBuilder().build();
         final String sessionId = request.getSession().getId();
-        // TODO
-        return Response.status(Response.Status.NOT_IMPLEMENTED).entity(userLoginRequest).build();
+        if (accountService.doLogin(sessionId, userLoginRequest)) {
+            //noinspection ConstantConditions
+            final long userId = accountService.getUserByLogin(userLoginRequest.getLogin()).getId();
+            result = Json.createObjectBuilder()
+                    .add("id", userId)
+                    .build();
+            Response.status(Response.Status.OK).entity(result).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).entity(result).build();
     }
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    public Response userLogout() {
-        // TODO
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+    public Response userLogout(@Context HttpServletRequest request) {
+        final String sessionId = request.getSession().getId();
+        accountService.doLogout(sessionId);
+        final JsonObject result = Json.createObjectBuilder().build();
+        return Response.status(Response.Status.OK).entity(result).build();
     }
 
 }
