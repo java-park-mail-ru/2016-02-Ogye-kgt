@@ -1,6 +1,6 @@
 package rest;
 
-import main.AccountService;
+import services.AccountService;
 
 import javax.inject.Singleton;
 import javax.json.Json;
@@ -31,7 +31,7 @@ public class Session {
         final JsonObject result = Json.createObjectBuilder()
                 .add("session", sessionId)
                 .build();
-        return Response.status(Response.Status.OK).entity(result).build();
+        return Response.status(Response.Status.NOT_IMPLEMENTED).entity(result).build();
 //        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
     }
 

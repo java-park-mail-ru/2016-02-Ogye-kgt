@@ -2,6 +2,7 @@ package main;
 
 import rest.Session;
 import rest.Users;
+import services.AccountService;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;

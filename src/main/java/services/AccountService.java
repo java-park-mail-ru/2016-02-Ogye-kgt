@@ -1,6 +1,6 @@
-package main;
+package services;
 
-import rest.UserProfile;
+import models.UserProfile;
 
 import java.util.Collection;
 import java.util.Map;
@@ -11,7 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class AccountService {
     private Map<Long, UserProfile> users = new ConcurrentHashMap<>();
-    private Map<String, UserProfile> sessions = new ConcurrentHashMap<>();
 
     public AccountService() {
         addUser(new UserProfile("admin", "admin", "admin@mail.ru"));

@@ -1,6 +1,8 @@
 package rest;
 
-import main.AccountService;
+import services.AccountService;
+import models.ForbiddenResponse;
+import models.UserProfile;
 
 import javax.inject.Singleton;
 import javax.json.Json;
