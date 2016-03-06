@@ -1,6 +1,7 @@
 package rest;
 
 import models.UserLoginRequest;
+import models.UserProfile;
 import services.AccountService;
 
 import javax.inject.Singleton;
@@ -42,11 +43,10 @@ public class Session {
     public Response userLogin(UserLoginRequest userLoginRequest, @Context HttpServletRequest request) {
         JsonObject result = Json.createObjectBuilder().build();
         final String sessionId = request.getSession().getId();
-        if (accountService.doLogin(sessionId, userLoginRequest)) {
-            //noinspection ConstantConditions
-            final long userId = accountService.getUserByLogin(userLoginRequest.getLogin()).getId();
+        final UserProfile userProfile = accountService.doLogin(sessionId, userLoginRequest);
+        if (userProfile != null) {
             result = Json.createObjectBuilder()
-                    .add("id", userId)
+                    .add("id", userProfile.getId())
                     .build();
             return Response.status(Response.Status.OK).entity(result).build();
         }

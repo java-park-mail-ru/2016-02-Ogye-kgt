@@ -23,8 +23,6 @@ public class AccountService {
     }
 
     public boolean addUser(UserProfile userProfile) {
-        final long userId = userProfile.getId();
-
         if (isUserExist(userProfile)) return false;
         users.put(userProfile.getId(), userProfile);
         return true;
@@ -92,14 +90,19 @@ public class AccountService {
         return sessions.containsKey(sessioinId);
     }
 
-    public boolean doLogin(String sessionId, UserLoginRequest user) {
+    @Nullable
+    public UserProfile doLogin(String sessionId, UserLoginRequest user) {
         final String login = user.getLogin();
         final UserProfile userProfile = getUserByLogin(login);
-        if (userProfile == null) return false;
+        if (userProfile == null) return null;
         addSession(sessionId, userProfile);
         //noinspection UnnecessaryLocalVariable
         final boolean isPasswordEqual = userProfile.getPassword().equals(user.getPassword());
-        return isPasswordEqual;
+        if (isPasswordEqual) {
+            return userProfile;
+        } else {
+            return null;
+        }
     }
 
     public void doLogout(String sessionId) {
