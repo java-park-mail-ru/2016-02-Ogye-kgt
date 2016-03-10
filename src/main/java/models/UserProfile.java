@@ -99,4 +99,8 @@ public class UserProfile {
         final Matcher emailMatcher = emailPattern.matcher(email);
         return emailMatcher.matches();
     }
+
+    public boolean isValid() {
+        return isLoginValid(login) && isEmailValid(email) && isPasswordValid(password);
+    }
 }

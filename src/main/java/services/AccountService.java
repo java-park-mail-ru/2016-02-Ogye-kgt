@@ -23,7 +23,7 @@ public class AccountService {
     }
 
     public boolean addUser(UserProfile userProfile) {
-        if (isUserExist(userProfile)) return false;
+        if (isUserExist(userProfile) || !userProfile.isValid()) return false;
         users.put(userProfile.getId(), userProfile);
         return true;
     }
