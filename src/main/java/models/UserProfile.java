@@ -43,7 +43,8 @@ public class UserProfile {
     }
 
     public void setLogin(@NotNull String login) {
-        this.login = login;
+        if (isLoginValid(login))
+            this.login = login;
     }
 
     @NotNull
@@ -52,7 +53,8 @@ public class UserProfile {
     }
 
     public void setPassword(@NotNull String password) {
-        this.password = password;
+        if (isPasswordValid(password))
+            this.password = password;
     }
 
     @NotNull
@@ -61,7 +63,8 @@ public class UserProfile {
     }
 
     public void setEmail(@NotNull String email) {
-        this.email = email;
+        if (isEmailValid(email))
+            this.email = email;
     }
 
     public long getId() {
