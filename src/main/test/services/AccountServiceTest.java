@@ -75,6 +75,16 @@ public class AccountServiceTest {
     }
 
     @Test
+    public void testRemoveUserWrongIdFail() throws Exception {
+        final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
+        accountService.addUser(testUser);
+        accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
+        final long wrondId = testUser.getId() + 1;
+        final boolean result = accountService.removeUser(TEST_SESSION_ID, wrondId);
+        assertFalse(result);
+    }
+
+    @Test
     public void testUpdateUser() throws Exception {
         final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
         final long userId = testUser.getId();
@@ -87,7 +97,7 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void testUpdateUserWrongUserId() throws Exception {
+    public void testUpdateUserWrongUserIdFail() throws Exception {
         final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
         accountService.addUser(testUser);
         accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
@@ -97,7 +107,17 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void testUpdateUserInvalidEmail() throws Exception {
+    public void testUpdateUserInvalidSessionFail() throws Exception {
+        final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
+        accountService.addUser(testUser);
+        accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
+        final String invalidSession = "000000000000000000000000";
+        final boolean result = accountService.updateUser(invalidSession, testUser.getId(), new UserProfile("newLogin", "testpass", "test@mail.ru"));
+        assertFalse(result);
+    }
+
+    @Test
+    public void testUpdateUserInvalidEmailFail() throws Exception {
         final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
         accountService.addUser(testUser);
         accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
