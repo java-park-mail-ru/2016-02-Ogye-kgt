@@ -49,9 +49,12 @@ public class AccountServiceTest {
     @Test
     public void testRemoveUser() throws Exception {
         final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
+        final long userId = testUser.getId();
         accountService.addUser(testUser);
-        final boolean result = accountService.removeUser(testUser.getId());
+        assertNotNull(accountService.getUser(userId));
+        final boolean result = accountService.removeUser(userId);
         assertTrue(result);
+        assertNull(accountService.getUser(userId));
     }
 
     @Test
@@ -59,7 +62,6 @@ public class AccountServiceTest {
         final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
         final boolean result = accountService.removeUser(testUser.getId());
         assertFalse(result);
-        assertNull(accountService.getUser(testUser.getId()));
     }
 
     @Test

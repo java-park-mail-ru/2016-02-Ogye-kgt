@@ -55,8 +55,9 @@ public class AccountService {
     }
 
     public boolean removeUser(String sessionId, long userId) {
-        if (!users.containsKey(userId)) return false;
-        if (sessions.get(sessionId).getId() != userId) return false;
+        final UserProfile userProfile = sessions.get(sessionId);
+        if (userProfile == null) return false;
+        if (userProfile.getId() != userId) return false;
         users.remove(userId);
         return true;
     }
@@ -123,10 +124,6 @@ public class AccountService {
         if (getUserBySession(sessionId) == null) return false;
         closeSession(sessionId);
         return true;
-    }
-
-    public boolean isUserMatch(String sessionId, long id) {
-        return sessions.get(sessionId).getId() == id;
     }
 
 }
