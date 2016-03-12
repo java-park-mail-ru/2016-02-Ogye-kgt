@@ -49,8 +49,14 @@ public class AccountService {
     }
 
     public boolean removeUser(long userId) {
-        if (!users.containsKey(userId))
-            return false;
+        if (!users.containsKey(userId)) return false;
+        users.remove(userId);
+        return true;
+    }
+
+    public boolean removeUser(String sessionId, long userId) {
+        if (!users.containsKey(userId)) return false;
+        if (sessions.get(sessionId).getId() != userId) return false;
         users.remove(userId);
         return true;
     }

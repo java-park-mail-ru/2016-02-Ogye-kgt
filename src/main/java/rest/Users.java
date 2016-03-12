@@ -71,7 +71,7 @@ public class Users {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteUserById(@PathParam("id") long id, @Context HttpServletRequest request) {
         final String sessionId = request.getSession().getId();
-        if (accountService.isUserMatch(sessionId, id) && accountService.removeUser(id)) {
+        if (accountService.removeUser(sessionId, id)) {
             return Response.status(Response.Status.OK).entity(Json.createObjectBuilder().build()).build();
         } else {
             return Response.status(Response.Status.FORBIDDEN).entity(new ForbiddenResponse()).build();

@@ -59,13 +59,48 @@ public class AccountServiceTest {
         final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
         final boolean result = accountService.removeUser(testUser.getId());
         assertFalse(result);
+        assertNull(accountService.getUser(testUser.getId()));
+    }
+
+    @Test
+    public void testRemoveUserWrongSessionFail() throws Exception {
+        final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
+        accountService.addUser(testUser);
+        accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
+        final String invalidSession = "000000000000000000000000";
+        final boolean result = accountService.removeUser(invalidSession, testUser.getId());
+        assertFalse(result);
     }
 
     @Test
     public void testUpdateUser() throws Exception {
         final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
+        final long userId = testUser.getId();
         accountService.addUser(testUser);
-        //todo
+        accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
+        final boolean result = accountService.updateUser(TEST_SESSION_ID, userId, new UserProfile("newLogin", "testpass", "test@mail.ru"));
+        assertTrue(result);
+        final UserProfile updatedUser = accountService.getUser(userId);
+        assertEquals(updatedUser.getLogin(), "newLogin");
+    }
+
+    @Test
+    public void testUpdateUserWrongUserId() throws Exception {
+        final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
+        accountService.addUser(testUser);
+        accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
+        final long wrongId = testUser.getId() + 1;
+        final boolean result = accountService.updateUser(TEST_SESSION_ID, wrongId, new UserProfile("newLogin", "testpass", "test@mail.ru"));
+        assertFalse(result);
+    }
+
+    @Test
+    public void testUpdateUserInvalidEmail() throws Exception {
+        final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
+        accountService.addUser(testUser);
+        accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
+        final boolean result = accountService.updateUser(TEST_SESSION_ID, testUser.getId(), new UserProfile("newLogin", "testpass", "invalidEmail"));
+        assertFalse(result);
     }
 
     @Test
