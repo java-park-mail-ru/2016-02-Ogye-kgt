@@ -84,7 +84,7 @@ public class Users {
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUser(@PathParam("id") long id, UserProfile userProfile, @Context HttpServletRequest request) {
         final String sessionId = request.getSession().getId();
-        if (accountService.isUserMatch(sessionId, id) && accountService.updateUser(id, userProfile)) {
+        if (accountService.updateUser(sessionId, id, userProfile)) {
             final JsonObject result = Json.createObjectBuilder()
                     .add("id", id)
                     .build();

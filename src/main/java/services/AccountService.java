@@ -13,11 +13,13 @@ public class AccountService {
     private Map<Long, UserProfile> users = new ConcurrentHashMap<>();
     private Map<String, UserProfile> sessions = new ConcurrentHashMap<>();
 
+    // FIXME: убрать, когда будет покрыто тестами.
     public AccountService() {
         addUser(new UserProfile("admin", "admin", "admin@mail.ru"));
         addUser(new UserProfile("guest", "12345", "guest@mail.ru"));
     }
 
+    // FIXME: тестовый метод, не выкладывать в прод.
     public Collection<UserProfile> getAllUsers() {
         return users.values();
     }
@@ -53,12 +55,18 @@ public class AccountService {
         return true;
     }
 
-    public boolean updateUser(long userId, UserProfile newProfile) {
-        if (!users.containsKey(userId))
-            return false;
-        final UserProfile userProfile = users.get(userId);
+    public boolean updateUser(final String sessionId, final long userId, UserProfile newProfile) {
+        final UserProfile userProfile = getUserBySession(sessionId);
+        if (userProfile == null) return false;
+        if (userProfile.getId() != userId) return false;
+
+        if (!UserProfile.isLoginValid(newProfile.getLogin())) return false;
+        if (!UserProfile.isPasswordValid(newProfile.getPassword())) return false;
+        if (!UserProfile.isEmailValid(newProfile.getEmail())) return false;
+
         userProfile.setLogin(newProfile.getLogin());
         userProfile.setPassword(newProfile.getPassword());
+        userProfile.setEmail(newProfile.getEmail());
         users.replace(userId, userProfile);
         return true;
     }
@@ -105,8 +113,10 @@ public class AccountService {
         }
     }
 
-    public void doLogout(String sessionId) {
+    public boolean doLogout(String sessionId) {
+        if (getUserBySession(sessionId) == null) return false;
         closeSession(sessionId);
+        return true;
     }
 
     public boolean isUserMatch(String sessionId, long id) {
