@@ -85,17 +85,19 @@ public class AccountServiceTest {
     @Test
     public void testUpdateUserWrongUserIdFail() throws Exception {
         accountService.addUser(testUser);
-        accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
+        accountService.doLogin(TEST_SESSION_ID, testLoginRequest);
         final long wrongId = testUser.getId() + 1;
-        final boolean result = accountService.updateUser(TEST_SESSION_ID, wrongId, new UserProfile("newLogin", "testpass", "test@mail.ru"));
+        final UserProfile newUser = new UserProfile("newLogin", "testpass", "test@mail.ru");
+        final boolean result = accountService.updateUser(TEST_SESSION_ID, wrongId, newUser);
         assertFalse(result);
     }
 
     @Test
     public void testUpdateUserInvalidSessionFail() throws Exception {
         accountService.addUser(testUser);
-        accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
-        final boolean result = accountService.updateUser(INVALID_SESSION_ID, testUser.getId(), new UserProfile("newLogin", "testpass", "test@mail.ru"));
+        accountService.doLogin(TEST_SESSION_ID, testLoginRequest);
+        final UserProfile newUser = new UserProfile("newLogin", "testpass", "test@mail.ru");
+        final boolean result = accountService.updateUser(INVALID_SESSION_ID, testUser.getId(), newUser);
         assertFalse(result);
     }
 
@@ -103,34 +105,28 @@ public class AccountServiceTest {
     public void testUpdateUserInvalidEmailFail() throws Exception {
         accountService.addUser(testUser);
         accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
-        final boolean result = accountService.updateUser(TEST_SESSION_ID, testUser.getId(), new UserProfile("newLogin", "testpass", "invalidEmail"));
+        final UserProfile newUser = new UserProfile("newLogin", "testpass", "invalidmail.ru");
+        final boolean result = accountService.updateUser(TEST_SESSION_ID, testUser.getId(), newUser);
         assertFalse(result);
     }
 
     @Test
     public void testDoLogin() throws Exception {
         accountService.addUser(testUser);
-
-        final UserLoginRequest userLoginRequest = new UserLoginRequest("testlogin", "testpass");
-
-        final UserProfile result = accountService.doLogin(TEST_SESSION_ID, userLoginRequest);
+        final UserProfile result = accountService.doLogin(TEST_SESSION_ID, testLoginRequest);
         assertNotNull(result);
     }
 
     @Test
     public void testDoLoginNoUserFail() throws Exception {
-        final UserLoginRequest userLoginRequest = new UserLoginRequest("testlogin", "testpass");
-
-        final UserProfile result = accountService.doLogin(TEST_SESSION_ID, userLoginRequest);
+        final UserProfile result = accountService.doLogin(TEST_SESSION_ID, testLoginRequest);
         assertNull(result);
     }
 
     @Test
     public void testDoLoginInvalidPassFail() throws Exception {
         accountService.addUser(testUser);
-
         final UserLoginRequest userLoginRequest = new UserLoginRequest("testlogin", "invalidPass");
-
         final UserProfile result = accountService.doLogin(TEST_SESSION_ID, userLoginRequest);
         assertNull(result);
     }
@@ -138,10 +134,7 @@ public class AccountServiceTest {
     @Test
     public void testDoLogout() throws Exception {
         accountService.addUser(testUser);
-
-        final UserLoginRequest userLoginRequest = new UserLoginRequest("testlogin", "testpass");
         accountService.doLogin(TEST_SESSION_ID, testLoginRequest);
-
         final boolean result = accountService.doLogout(TEST_SESSION_ID);
         assertTrue(result);
     }
