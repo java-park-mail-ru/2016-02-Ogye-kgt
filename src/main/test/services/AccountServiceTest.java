@@ -9,46 +9,36 @@ import static org.junit.Assert.*;
 
 public class AccountServiceTest {
     private AccountService accountService;
+    private UserProfile testUser;
+    private UserLoginRequest testLoginRequest;
     private static final String TEST_SESSION_ID = "bjvs7ieafcl8ub8qk0ur9ts0";
+    private static final String INVALID_SESSION_ID = "000000000000000000000000";
+    private static final String TEST_LOGIN = "testlogin";
+    private static final String TEST_PASS = "testpass";
 
     @Before
     public void setUp() throws Exception {
         accountService = new AccountService();
-
+        testUser = new UserProfile(TEST_LOGIN, TEST_PASS, "test@mail.ru");
+        testLoginRequest = new UserLoginRequest(TEST_LOGIN, TEST_PASS);
     }
 
     @Test
     public void testAddUser() throws Exception {
-        final boolean result = accountService.addUser(new UserProfile("testlogin", "testpass", "test@mail.ru"));
+        final boolean result = accountService.addUser(testUser);
         assertTrue(result);
     }
 
     @Test
     public void testAddSameUserFail() throws Exception {
-        final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
         accountService.addUser(testUser);
         final boolean result = accountService.addUser(testUser);
         assertFalse(result);
     }
 
-    @Test
-    public void testGetUser() throws Exception {
-
-    }
-
-    @Test
-    public void testGetUserByLogin() throws Exception {
-
-    }
-
-    @Test
-    public void testGetUserBySession() throws Exception {
-
-    }
 
     @Test
     public void testRemoveUser() throws Exception {
-        final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
         final long userId = testUser.getId();
         accountService.addUser(testUser);
         assertNotNull(accountService.getUser(userId));
@@ -59,26 +49,22 @@ public class AccountServiceTest {
 
     @Test
     public void testRemoveNoUserFail() throws Exception {
-        final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
         final boolean result = accountService.removeUser(testUser.getId());
         assertFalse(result);
     }
 
     @Test
     public void testRemoveUserWrongSessionFail() throws Exception {
-        final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
         accountService.addUser(testUser);
-        accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
-        final String invalidSession = "000000000000000000000000";
-        final boolean result = accountService.removeUser(invalidSession, testUser.getId());
+        accountService.doLogin(TEST_SESSION_ID, testLoginRequest);
+        final boolean result = accountService.removeUser(INVALID_SESSION_ID, testUser.getId());
         assertFalse(result);
     }
 
     @Test
     public void testRemoveUserWrongIdFail() throws Exception {
-        final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
         accountService.addUser(testUser);
-        accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
+        accountService.doLogin(TEST_SESSION_ID, testLoginRequest);
         final long wrondId = testUser.getId() + 1;
         final boolean result = accountService.removeUser(TEST_SESSION_ID, wrondId);
         assertFalse(result);
@@ -86,19 +72,18 @@ public class AccountServiceTest {
 
     @Test
     public void testUpdateUser() throws Exception {
-        final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
         final long userId = testUser.getId();
         accountService.addUser(testUser);
-        accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
-        final boolean result = accountService.updateUser(TEST_SESSION_ID, userId, new UserProfile("newLogin", "testpass", "test@mail.ru"));
+        accountService.doLogin(TEST_SESSION_ID, testLoginRequest);
+        final UserProfile newProfile = new UserProfile("newLogin", "testpass", "test@mail.ru");
+        final boolean result = accountService.updateUser(TEST_SESSION_ID, userId, newProfile);
         assertTrue(result);
         final UserProfile updatedUser = accountService.getUser(userId);
-        assertEquals(updatedUser.getLogin(), "newLogin");
+        assertEquals(updatedUser.getLogin(), newProfile.getLogin());
     }
 
     @Test
     public void testUpdateUserWrongUserIdFail() throws Exception {
-        final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
         accountService.addUser(testUser);
         accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
         final long wrongId = testUser.getId() + 1;
@@ -108,17 +93,14 @@ public class AccountServiceTest {
 
     @Test
     public void testUpdateUserInvalidSessionFail() throws Exception {
-        final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
         accountService.addUser(testUser);
         accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
-        final String invalidSession = "000000000000000000000000";
-        final boolean result = accountService.updateUser(invalidSession, testUser.getId(), new UserProfile("newLogin", "testpass", "test@mail.ru"));
+        final boolean result = accountService.updateUser(INVALID_SESSION_ID, testUser.getId(), new UserProfile("newLogin", "testpass", "test@mail.ru"));
         assertFalse(result);
     }
 
     @Test
     public void testUpdateUserInvalidEmailFail() throws Exception {
-        final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
         accountService.addUser(testUser);
         accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
         final boolean result = accountService.updateUser(TEST_SESSION_ID, testUser.getId(), new UserProfile("newLogin", "testpass", "invalidEmail"));
@@ -126,18 +108,7 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void testIsUserExist() throws Exception {
-
-    }
-
-    @Test
-    public void testIsAuthorised() throws Exception {
-
-    }
-
-    @Test
     public void testDoLogin() throws Exception {
-        final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
         accountService.addUser(testUser);
 
         final UserLoginRequest userLoginRequest = new UserLoginRequest("testlogin", "testpass");
@@ -156,7 +127,6 @@ public class AccountServiceTest {
 
     @Test
     public void testDoLoginInvalidPassFail() throws Exception {
-        final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
         accountService.addUser(testUser);
 
         final UserLoginRequest userLoginRequest = new UserLoginRequest("testlogin", "invalidPass");
@@ -167,11 +137,10 @@ public class AccountServiceTest {
 
     @Test
     public void testDoLogout() throws Exception {
-        final UserProfile testUser = new UserProfile("testlogin", "testpass", "test@mail.ru");
         accountService.addUser(testUser);
 
         final UserLoginRequest userLoginRequest = new UserLoginRequest("testlogin", "testpass");
-        accountService.doLogin(TEST_SESSION_ID, userLoginRequest);
+        accountService.doLogin(TEST_SESSION_ID, testLoginRequest);
 
         final boolean result = accountService.doLogout(TEST_SESSION_ID);
         assertTrue(result);
@@ -179,13 +148,8 @@ public class AccountServiceTest {
 
     @Test
     public void testDoLogoutNoSessionFail() throws Exception {
-        final String invalidSessionId = "000000000000000000000000";
-        final boolean result = accountService.doLogout(invalidSessionId);
+        final boolean result = accountService.doLogout(INVALID_SESSION_ID);
         assertFalse(result);
     }
 
-    @Test
-    public void testIsUserMatch() throws Exception {
-
-    }
 }
