@@ -21,12 +21,6 @@ public class UsersTest extends JerseyTest {
     }
 
     @Test
-    public void testGetAdmin() {
-        final String adminJson = target("user").path("1").request().get(String.class);
-        assertEquals(adminJson, "{\"id\":1,\"login\":\"guest\",\"email\":\"guest@mail.ru\"}");
-    }
-
-    @Test
     public void testCreateUser() throws Exception {
         final UserProfile testUser = new UserProfile("testlogin", "qwerty", "test@mail.ru");
         final Entity<UserProfile> userEntity = Entity.entity(testUser, MediaType.APPLICATION_JSON_TYPE);
