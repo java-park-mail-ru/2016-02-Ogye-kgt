@@ -13,8 +13,8 @@ public class AccountService {
     private Map<Long, UserProfile> users = new ConcurrentHashMap<>();
     private Map<String, UserProfile> sessions = new ConcurrentHashMap<>();
 
-    // FIXME: убрать, когда будет покрыто тестами.
     public AccountService() {
+        // FIXME: убрать, когда будет покрыто тестами.
         addUser(new UserProfile("admin", "admin", "admin@mail.ru"));
         addUser(new UserProfile("guest", "12345", "guest@mail.ru"));
     }
