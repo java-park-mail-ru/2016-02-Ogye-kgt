@@ -3,7 +3,9 @@ package rest;
 import models.ForbiddenResponse;
 import models.UserProfile;
 import services.AccountService;
+import services.AccountServiceImpl;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -19,10 +21,13 @@ import java.util.Collection;
 @Singleton
 @Path("/user")
 public class Users {
+    @Inject
+    private main.Context context;
+
     private AccountService accountService;
 
-    public Users(AccountService accountService) {
-        this.accountService = accountService;
+    public Users() {
+        accountService = context.get(AccountService.class);
     }
 
     @GET

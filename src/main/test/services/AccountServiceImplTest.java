@@ -7,8 +7,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class AccountServiceTest {
-    private AccountService accountService;
+public class AccountServiceImplTest {
+    private AccountServiceImpl accountService;
     private UserProfile testUser;
     private UserLoginRequest testLoginRequest;
     private static final String TEST_SESSION_ID = "bjvs7ieafcl8ub8qk0ur9ts0";
@@ -18,7 +18,7 @@ public class AccountServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        accountService = new AccountService();
+        accountService = new AccountServiceImpl();
         testUser = new UserProfile(TEST_LOGIN, TEST_PASS, "test@mail.ru");
         testLoginRequest = new UserLoginRequest(TEST_LOGIN, TEST_PASS);
     }

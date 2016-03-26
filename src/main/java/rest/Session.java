@@ -3,7 +3,9 @@ package rest;
 import models.UserLoginRequest;
 import models.UserProfile;
 import services.AccountService;
+import services.AccountServiceImpl;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -17,10 +19,13 @@ import javax.ws.rs.core.Response;
 @Singleton
 @Path("/session")
 public class Session {
+    @Inject
+    private main.Context context;
+
     private AccountService accountService;
 
-    public Session(AccountService accountService) {
-        this.accountService = accountService;
+    public Session() {
+        accountService = context.get(AccountService.class);
     }
 
     @GET

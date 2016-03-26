@@ -30,6 +30,9 @@ public class AccServPersistTest {
         final UserProfile up2 = new UserProfile("Анатолий", "qwerty", "anatilijus@mail.ru");
         accServ.save(up1);
         accServ.save(up2);
+        final UserProfile cup1 = accServ.readByName("Alexandr");
+        final UserProfile cup2 = accServ.readByName("Анатолий");
+
     }
 
     @Test

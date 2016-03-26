@@ -38,4 +38,17 @@ public class UserProfileTest {
         for (String email : invalidEmails)
             assertFalse("Invalid email validation fault", isEmailValid(email));
     }
+
+    @Test
+    public void equals() throws Exception {
+        final UserProfile up1 = new UserProfile("login", "qwerty", "exampl@mail.ru");
+        final UserProfile up2 = new UserProfile("login", "qwerty", "exampl@mail.ru");
+        final UserProfile up3 = new UserProfile("login", "qwerty", "enother@mail.ru");
+        final UserProfile up4 = new UserProfile("login", "123456", "enother@mail.ru");
+        final UserProfile up5 = new UserProfile("other", "qwerty", "enother@mail.ru");
+        assertEquals(up1, up2);
+        assertNotEquals(up2, up3);
+        assertNotEquals(up3, up4);
+        assertNotEquals(up4, up5);
+    }
 }
