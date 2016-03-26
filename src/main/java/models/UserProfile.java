@@ -2,11 +2,15 @@ package models;
 
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+@Entity
+@Table(name = "UserProfile")
 public class UserProfile {
     private static final AtomicLong ID_GENETATOR = new AtomicLong(0);
     private static final int MIN_LOGIN_LENGTH = 3;
@@ -21,14 +25,11 @@ public class UserProfile {
     private String password;
     @NotNull
     private String email;
+    @Id
     private long id;
 
-    public UserProfile() {
-        login = "";
-        password = "";
-        email = "";
-        id = 0;
-    }
+
+    public UserProfile() {}
 
     public UserProfile(@NotNull String login, @NotNull String password, @NotNull String email) {
         this.login = login;
