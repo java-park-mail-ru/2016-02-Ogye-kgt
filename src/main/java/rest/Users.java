@@ -24,15 +24,11 @@ public class Users {
     @Inject
     private main.Context context;
 
-    private AccountService accountService;
-
-    public Users() {
-        accountService = context.get(AccountService.class);
-    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsers() {
+        final AccountService accountService = context.get(AccountService.class);
         final Collection<UserProfile> allUsers = accountService.getAllUsers();
         return Response.status(Response.Status.OK).entity(allUsers.toArray(new UserProfile[allUsers.size()])).build();
     }
@@ -41,6 +37,7 @@ public class Users {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createUser(UserProfile user, @Context HttpHeaders headers) {
+        final AccountService accountService = context.get(AccountService.class);
         user.setId();
         if (accountService.addUser(user)) {
             final JsonObject result = Json.createObjectBuilder()
@@ -58,6 +55,7 @@ public class Users {
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserById(@PathParam("id") long id) {
+        final AccountService accountService = context.get(AccountService.class);
         final UserProfile user = accountService.getUser(id);
         if (user == null) {
             return Response.status(Response.Status.FORBIDDEN).build();
@@ -75,6 +73,7 @@ public class Users {
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteUserById(@PathParam("id") long id, @Context HttpServletRequest request) {
+        final AccountService accountService = context.get(AccountService.class);
         final String sessionId = request.getSession().getId();
         if (accountService.removeUser(sessionId, id)) {
             return Response.status(Response.Status.OK).entity(Json.createObjectBuilder().build()).build();
@@ -88,6 +87,7 @@ public class Users {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUser(@PathParam("id") long id, UserProfile userProfile, @Context HttpServletRequest request) {
+        final AccountService accountService = context.get(AccountService.class);
         final String sessionId = request.getSession().getId();
         if (accountService.updateUser(sessionId, id, userProfile)) {
             final JsonObject result = Json.createObjectBuilder()

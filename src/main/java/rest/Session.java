@@ -5,6 +5,7 @@ import models.UserProfile;
 import services.AccountService;
 import services.AccountServiceImpl;
 
+import javax.accessibility.AccessibleAction;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.json.Json;
@@ -22,15 +23,11 @@ public class Session {
     @Inject
     private main.Context context;
 
-    private AccountService accountService;
-
-    public Session() {
-        accountService = context.get(AccountService.class);
-    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response checkAuth(@Context HttpServletRequest request) {
+        final AccountService accountService = context.get(AccountService.class);
         final String sessionId = request.getSession().getId();
         JsonObject result = Json.createObjectBuilder().build();
         if (accountService.isAuthorised(sessionId)) {
@@ -46,6 +43,7 @@ public class Session {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response userLogin(UserLoginRequest userLoginRequest, @Context HttpServletRequest request) {
+        final AccountService accountService = context.get(AccountService.class);
         JsonObject result = Json.createObjectBuilder().build();
         final String sessionId = request.getSession().getId();
         final UserProfile userProfile = accountService.doLogin(sessionId, userLoginRequest);
@@ -61,6 +59,7 @@ public class Session {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     public Response userLogout(@Context HttpServletRequest request) {
+        final AccountService accountService = context.get(AccountService.class);
         final String sessionId = request.getSession().getId();
         accountService.doLogout(sessionId);
         final JsonObject result = Json.createObjectBuilder().build();
