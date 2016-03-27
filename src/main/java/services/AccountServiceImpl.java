@@ -2,6 +2,12 @@ package services;
 
 import models.UserLoginRequest;
 import models.UserProfile;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -9,17 +15,43 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class AccountServiceImpl implements AccountService{
+public class AccountServiceImpl implements AccountService {
     private Map<Long, UserProfile> users = new ConcurrentHashMap<>();
     private Map<String, UserProfile> sessions = new ConcurrentHashMap<>();
+
+    private SessionFactory sessionFactory;
 
     public AccountServiceImpl() {
         // FIXME: убрать, когда будет покрыто тестами.
         addUser(new UserProfile("admin", "admin", "admin@mail.ru"));
         addUser(new UserProfile("guest", "12345", "guest@mail.ru"));
+
+        final Configuration configuration = new Configuration();
+        configuration.addAnnotatedClass(UserProfile.class);
+
+        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
+        configuration.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
+        configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/tp_app");
+        configuration.setProperty("hibernate.connection.username", "root");
+        configuration.setProperty("hibernate.connection.password", "root");
+        configuration.setProperty("hibernate.show_sql", "true");
+        configuration.setProperty("hibernate.hbm2ddl.auto", "create");
+
+        sessionFactory = createSessionFactory(configuration);
     }
 
+    @Override
+    public String getLocalStatus() {
+        final String status;
+        try (Session session = sessionFactory.openSession()) {
+            final Transaction transaction = session.beginTransaction();
+            status = transaction.getStatus().toString();
+            transaction.commit();
+        }
+        return status;
+    }
     // FIXME: тестовый метод, не выкладывать в прод.
+    @Override
     public Collection<UserProfile> getAllUsers() {
         return users.values();
     }
@@ -46,16 +78,19 @@ public class AccountServiceImpl implements AccountService{
         return null;
     }
 
+    @Override
     public UserProfile getUserBySession(String sessionId) {
         return sessions.get(sessionId);
     }
 
+    @Override
     public boolean removeUser(long userId) {
         if (!users.containsKey(userId)) return false;
         users.remove(userId);
         return true;
     }
 
+    @Override
     public boolean removeUser(String sessionId, long userId) {
         final UserProfile userProfile = sessions.get(sessionId);
         if (userProfile == null) return false;
@@ -64,6 +99,7 @@ public class AccountServiceImpl implements AccountService{
         return true;
     }
 
+    @Override
     public boolean updateUser(final String sessionId, final long userId, UserProfile newProfile) {
         final UserProfile userProfile = getUserBySession(sessionId);
         if (userProfile == null) return false;
@@ -103,10 +139,12 @@ public class AccountServiceImpl implements AccountService{
         sessions.remove(sessionId);
     }
 
+    @Override
     public boolean isAuthorised(String sessioinId) {
         return sessions.containsKey(sessioinId);
     }
 
+    @Override
     @Nullable
     public UserProfile doLogin(String sessionId, UserLoginRequest user) {
         final String login = user.getLogin();
@@ -122,10 +160,18 @@ public class AccountServiceImpl implements AccountService{
         }
     }
 
+    @Override
     public boolean doLogout(String sessionId) {
         if (getUserBySession(sessionId) == null) return false;
         closeSession(sessionId);
         return true;
+    }
+
+    private static SessionFactory createSessionFactory(Configuration configuration) {
+        final StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
+        builder.applySettings(configuration.getProperties());
+        final ServiceRegistry serviceRegistry = builder.build();
+        return configuration.buildSessionFactory(serviceRegistry);
     }
 
 }

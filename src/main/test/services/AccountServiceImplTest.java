@@ -145,4 +145,9 @@ public class AccountServiceImplTest {
         assertFalse(result);
     }
 
+    @Test
+    public void getLocalStatus() throws Exception {
+        final String result = accountService.getLocalStatus();
+        assertEquals(result, "ACTIVE");
+    }
 }

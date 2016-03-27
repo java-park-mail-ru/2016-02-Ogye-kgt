@@ -6,6 +6,8 @@ import models.UserProfile;
 import java.util.Collection;
 
 public interface AccountService {
+    String getLocalStatus();
+
     boolean addUser(UserProfile userProfile);
 
     UserProfile getUser(long userId);
