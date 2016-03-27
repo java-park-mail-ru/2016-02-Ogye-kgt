@@ -1,13 +1,20 @@
 package rest;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
+import main.Context;
 import main.RestApplication;
 import models.UserProfile;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Before;
 import org.junit.Test;
+import services.AccountService;
+import services.AccountServiceImpl;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
@@ -17,8 +24,23 @@ import javax.ws.rs.core.Response;
 public class UsersTest extends JerseyTest {
     @Override
     protected Application configure() {
-        return new RestApplication();
+        final Context context = new Context();
+        context.put(AccountService.class, new AccountServiceImpl());
+
+        final ResourceConfig config = new ResourceConfig(Users.class);
+        final HttpServletRequest request = mock(HttpServletRequest.class);
+        //noinspection AnonymousInnerClassMayBeStatic
+        config.register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(context);
+                bind(request).to(HttpServletRequest.class);
+            }
+        });
+
+        return config;
     }
+
 
     @Test
     public void testCreateUser() throws Exception {
