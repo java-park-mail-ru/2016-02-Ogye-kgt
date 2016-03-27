@@ -172,6 +172,9 @@ public class AccountServiceImplTest {
 
     @Test
     public void getUserByLogin() throws Exception {
-
+        accountService.addUser(testUser);
+        final UserProfile user = accountService.getUserByLogin(testUser.getLogin());
+        assertNotNull(user);
+        assertEquals(testUser, user);
     }
 }
