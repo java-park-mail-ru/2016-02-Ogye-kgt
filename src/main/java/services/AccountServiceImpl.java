@@ -9,6 +9,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 import org.jetbrains.annotations.Nullable;
+import services.dao.UserProfileDAO;
 
 import java.util.Collection;
 import java.util.Map;
@@ -22,10 +23,6 @@ public class AccountServiceImpl implements AccountService {
     private SessionFactory sessionFactory;
 
     public AccountServiceImpl() {
-        // FIXME: убрать, когда будет покрыто тестами.
-        addUser(new UserProfile("admin", "admin", "admin@mail.ru"));
-        addUser(new UserProfile("guest", "12345", "guest@mail.ru"));
-
         final Configuration configuration = new Configuration();
         configuration.addAnnotatedClass(UserProfile.class);
 
@@ -50,6 +47,7 @@ public class AccountServiceImpl implements AccountService {
         }
         return status;
     }
+
     // FIXME: тестовый метод, не выкладывать в прод.
     @Override
     public Collection<UserProfile> getAllUsers() {
@@ -59,7 +57,12 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public boolean addUser(UserProfile userProfile) {
         if (isUserExist(userProfile) || !userProfile.isValid()) return false;
-        users.put(userProfile.getId(), userProfile);
+        try (Session session = sessionFactory.openSession()) {
+            final Transaction transaction = session.beginTransaction();
+            final UserProfileDAO dao = new UserProfileDAO(session);
+            dao.save(userProfile);
+            transaction.commit();
+        }
         return true;
     }
 
