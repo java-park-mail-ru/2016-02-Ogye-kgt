@@ -27,6 +27,11 @@ public class UserProfileDAO {
         return (UserProfile) criteria.add(Restrictions.eq("login", name)).uniqueResult();
     }
 
+    public void delete(long id) {
+        UserProfile userProfile = session.load(UserProfile.class, id);
+        session.delete(userProfile);
+    }
+
     @SuppressWarnings("unchecked")
     public List<UserProfile> readAll() {
         final Criteria criteria = session.createCriteria(UserProfile.class);

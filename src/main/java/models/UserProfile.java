@@ -29,7 +29,8 @@ public class UserProfile {
     private long id;
 
 
-    public UserProfile() {}
+    public UserProfile() {
+    }
 
     public UserProfile(@NotNull String login, @NotNull String password, @NotNull String email) {
         this.login = login;
@@ -72,13 +73,7 @@ public class UserProfile {
         return id;
     }
 
-    public void setId() {
-        this.id = ID_GENETATOR.getAndIncrement();
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
+    public void setId() {}
 
     public static boolean isLoginValid(String login) {
         if (login == null) return false;

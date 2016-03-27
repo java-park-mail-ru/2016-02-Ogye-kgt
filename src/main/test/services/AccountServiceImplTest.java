@@ -28,7 +28,6 @@ public class AccountServiceImplTest {
     @Test
     public void testAddUser() throws Exception {
         assertNotNull(accountService.addUser(testUser));
-        System.out.println(accountService.addUser(new UserProfile("login1", "qwerty", "aasdfsdf@mail.ru")));
     }
 
     @Test
@@ -52,8 +51,7 @@ public class AccountServiceImplTest {
 
     @Test
     public void testRemoveUser() throws Exception {
-        final long userId = testUser.getId();
-        accountService.addUser(testUser);
+        final long userId = accountService.addUser(testUser);
         assertNotNull(accountService.getUser(userId));
         final boolean result = accountService.removeUser(userId);
         assertTrue(result);

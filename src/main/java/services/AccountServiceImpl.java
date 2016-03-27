@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class AccountServiceImpl implements AccountService {
-    private Map<Long, UserProfile> users = new ConcurrentHashMap<>();
+//    private Map<Long, UserProfile> users = new ConcurrentHashMap<>();
     private Map<String, UserProfile> sessions = new ConcurrentHashMap<>();
 
     private SessionFactory sessionFactory;
@@ -51,8 +51,16 @@ public class AccountServiceImpl implements AccountService {
 
     // FIXME: тестовый метод, не выкладывать в прод.
     @Override
+    @Nullable
     public Collection<UserProfile> getAllUsers() {
-        return users.values();
+        final Collection<UserProfile> users;
+        try (Session session = sessionFactory.openSession()) {
+            final Transaction transaction = session.beginTransaction();
+            final UserProfileDAO dao = new UserProfileDAO(session);
+            users = dao.readAll();
+            transaction.commit();
+        }
+        return users;
     }
 
     @Override
@@ -67,6 +75,7 @@ public class AccountServiceImpl implements AccountService {
             userId = dao.save(userProfile);
             transaction.commit();
         } catch (HibernateException e) {
+            // todo: добавить проверку на тип исключения.
             throw new UserExistsException("User Already Exists");
         }
         return userId;
@@ -104,8 +113,15 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public boolean removeUser(long userId) {
-        if (!users.containsKey(userId)) return false;
-        users.remove(userId);
+        try (Session session = sessionFactory.openSession()) {
+            final Transaction transaction = session.beginTransaction();
+            final UserProfileDAO dao = new UserProfileDAO(session);
+            dao.delete(userId);
+            transaction.commit();
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            return false;
+        }
         return true;
     }
 
@@ -114,8 +130,7 @@ public class AccountServiceImpl implements AccountService {
         final UserProfile userProfile = sessions.get(sessionId);
         if (userProfile == null) return false;
         if (userProfile.getId() != userId) return false;
-        users.remove(userId);
-        return true;
+        return removeUser(userId);
     }
 
     @Override
@@ -131,22 +146,22 @@ public class AccountServiceImpl implements AccountService {
         userProfile.setLogin(newProfile.getLogin());
         userProfile.setPassword(newProfile.getPassword());
         userProfile.setEmail(newProfile.getEmail());
-        users.replace(userId, userProfile);
+//        users.replace(userId, userProfile);
         return true;
     }
 
     public boolean isUserExist(UserProfile userProfile) {
         final String login = userProfile.getLogin();
-        for (UserProfile curUserProfile : users.values()) {
-            if (curUserProfile.getLogin().equals(login)) return true;
-        }
+//        for (UserProfile curUserProfile : users.values()) {
+//            if (curUserProfile.getLogin().equals(login)) return true;
+//        }
         return false;
     }
 
     public boolean isUserExist(String login) {
-        for (UserProfile curUserProfile : users.values()) {
-            if (curUserProfile.getLogin().equals(login)) return true;
-        }
+//        for (UserProfile curUserProfile : users.values()) {
+//            if (curUserProfile.getLogin().equals(login)) return true;
+//        }
         return false;
     }
 
