@@ -83,14 +83,13 @@ public class AccountServiceImplTest {
 
     @Test
     public void testUpdateUser() throws Exception {
-        final long userId = testUser.getId();
-        accountService.addUser(testUser);
+        final long userId = accountService.addUser(testUser);
         accountService.doLogin(TEST_SESSION_ID, testLoginRequest);
         final UserProfile newProfile = new UserProfile("newLogin", "testpass", "test@mail.ru");
         final boolean result = accountService.updateUser(TEST_SESSION_ID, userId, newProfile);
         assertTrue(result);
         final UserProfile updatedUser = accountService.getUser(userId);
-        assertEquals(updatedUser.getLogin(), newProfile.getLogin());
+        assertEquals(updatedUser, newProfile);
     }
 
     @Test

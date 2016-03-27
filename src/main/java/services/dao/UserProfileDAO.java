@@ -28,8 +28,12 @@ public class UserProfileDAO {
     }
 
     public void delete(long id) {
-        UserProfile userProfile = session.load(UserProfile.class, id);
+        final UserProfile userProfile = session.load(UserProfile.class, id);
         session.delete(userProfile);
+    }
+
+    public void update(UserProfile newProfile) {
+        session.update(newProfile);
     }
 
     @SuppressWarnings("unchecked")

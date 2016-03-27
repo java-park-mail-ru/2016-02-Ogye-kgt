@@ -65,7 +65,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public long addUser(UserProfile userProfile) throws UserExistsException, InvalidUserException {
-        if (isUserExist(userProfile) || !userProfile.isValid()) {
+        if (!userProfile.isValid()) {
             throw new InvalidUserException("Invalid User");
         }
         final long userId;
@@ -146,11 +146,19 @@ public class AccountServiceImpl implements AccountService {
         userProfile.setLogin(newProfile.getLogin());
         userProfile.setPassword(newProfile.getPassword());
         userProfile.setEmail(newProfile.getEmail());
-//        users.replace(userId, userProfile);
+        try (Session session = sessionFactory.openSession()) {
+            final Transaction transaction = session.beginTransaction();
+            final UserProfileDAO dao = new UserProfileDAO(session);
+            dao.update(userProfile);
+            transaction.commit();
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            return false;
+        }
         return true;
     }
 
-    public boolean isUserExist(UserProfile userProfile) {
+/*    public boolean isUserExist(UserProfile userProfile) {
         final String login = userProfile.getLogin();
 //        for (UserProfile curUserProfile : users.values()) {
 //            if (curUserProfile.getLogin().equals(login)) return true;
@@ -163,7 +171,7 @@ public class AccountServiceImpl implements AccountService {
 //            if (curUserProfile.getLogin().equals(login)) return true;
 //        }
         return false;
-    }
+    }*/
 
     private void addSession(String sessionId, UserProfile userProfile) {
         sessions.put(sessionId, userProfile);
