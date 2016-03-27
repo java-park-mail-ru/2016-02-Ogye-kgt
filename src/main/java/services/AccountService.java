@@ -8,7 +8,7 @@ import java.util.Collection;
 public interface AccountService {
     String getLocalStatus();
 
-    boolean addUser(UserProfile userProfile);
+    long addUser(UserProfile userProfile) throws AccountServiceImpl.UserExistsException, AccountServiceImpl.InvalidUserException;
 
     UserProfile getUser(long userId);
 

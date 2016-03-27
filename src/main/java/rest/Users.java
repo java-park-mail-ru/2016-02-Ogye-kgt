@@ -4,6 +4,8 @@ import models.ForbiddenResponse;
 import models.UserProfile;
 import services.AccountService;
 import services.AccountServiceImpl;
+import services.AccountServiceImpl.InvalidUserException;
+import services.AccountServiceImpl.UserExistsException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -38,14 +40,19 @@ public class Users {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createUser(UserProfile user, @Context HttpHeaders headers) {
         final AccountService accountService = context.get(AccountService.class);
-        user.setId();
-        if (accountService.addUser(user)) {
+        try {
+            accountService.addUser(user);
             final JsonObject result = Json.createObjectBuilder()
                     .add("id", user.getId()).build();
             return Response.status(Response.Status.OK).entity(result).build();
-        } else {
+        } catch (UserExistsException e) {
             final JsonObject result = Json.createObjectBuilder()
                     .add("message", "login exist")
+                    .build();
+            return Response.status(Response.Status.FORBIDDEN).entity(result).build();
+        } catch (InvalidUserException e) {
+            final JsonObject result = Json.createObjectBuilder()
+                    .add("message", "invalid user")
                     .build();
             return Response.status(Response.Status.FORBIDDEN).entity(result).build();
         }

@@ -14,8 +14,8 @@ public class UserProfileDAO {
         this.session = session;
     }
 
-    public void save(UserProfile dataSet) {
-        session.save(dataSet);
+    public long save(UserProfile dataSet) {
+        return (long) session.save(dataSet);
     }
 
     public UserProfile read(long id) {

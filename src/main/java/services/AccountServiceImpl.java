@@ -2,6 +2,7 @@ package services;
 
 import models.UserLoginRequest;
 import models.UserProfile;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -55,30 +56,45 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public boolean addUser(UserProfile userProfile) {
-        if (isUserExist(userProfile) || !userProfile.isValid()) return false;
+    public long addUser(UserProfile userProfile) throws UserExistsException, InvalidUserException {
+        if (isUserExist(userProfile) || !userProfile.isValid()) {
+            throw new InvalidUserException("Invalid User");
+        }
+        final long userId;
         try (Session session = sessionFactory.openSession()) {
             final Transaction transaction = session.beginTransaction();
             final UserProfileDAO dao = new UserProfileDAO(session);
-            dao.save(userProfile);
+            userId = dao.save(userProfile);
             transaction.commit();
+        } catch (HibernateException e) {
+            throw new UserExistsException("User Already Exists");
         }
-        return true;
+        return userId;
     }
 
     @Override
+    @Nullable
     public UserProfile getUser(long userId) {
-        return users.get(userId);
+        final UserProfile userProfile;
+        try (Session session = sessionFactory.openSession()) {
+            final Transaction transaction = session.beginTransaction();
+            final UserProfileDAO dao = new UserProfileDAO(session);
+            userProfile = dao.read(userId);
+            transaction.commit();
+        }
+        return userProfile;
     }
 
     @Nullable
     public UserProfile getUserByLogin(String login) {
-        for (UserProfile user : users.values()) {
-            if (user.getLogin().equals(login)) {
-                return user;
-            }
+        final UserProfile userProfile;
+        try (Session session = sessionFactory.openSession()) {
+            final Transaction transaction = session.beginTransaction();
+            final UserProfileDAO dao = new UserProfileDAO(session);
+            userProfile = dao.readByName(login);
+            transaction.commit();
         }
-        return null;
+        return userProfile;
     }
 
     @Override
@@ -175,6 +191,18 @@ public class AccountServiceImpl implements AccountService {
         builder.applySettings(configuration.getProperties());
         final ServiceRegistry serviceRegistry = builder.build();
         return configuration.buildSessionFactory(serviceRegistry);
+    }
+
+    public static class UserExistsException extends Exception {
+        public UserExistsException(String message) {
+            super(message);
+        }
+    }
+
+    public static class InvalidUserException extends Exception {
+        public InvalidUserException(String message) {
+            super(message);
+        }
     }
 
 }

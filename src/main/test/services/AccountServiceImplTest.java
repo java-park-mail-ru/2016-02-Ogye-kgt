@@ -4,6 +4,8 @@ import models.UserLoginRequest;
 import models.UserProfile;
 import org.junit.Before;
 import org.junit.Test;
+import services.AccountServiceImpl.InvalidUserException;
+import services.AccountServiceImpl.UserExistsException;
 
 import static org.junit.Assert.*;
 
@@ -25,17 +27,28 @@ public class AccountServiceImplTest {
 
     @Test
     public void testAddUser() throws Exception {
-        final boolean result = accountService.addUser(testUser);
-        assertTrue(result);
+        assertNotNull(accountService.addUser(testUser));
+        System.out.println(accountService.addUser(new UserProfile("login1", "qwerty", "aasdfsdf@mail.ru")));
     }
 
     @Test
     public void testAddSameUserFail() throws Exception {
         accountService.addUser(testUser);
-        final boolean result = accountService.addUser(testUser);
-        assertFalse(result);
+        try {
+            accountService.addUser(testUser);
+        } catch (UserExistsException e) {
+            e.printStackTrace();
+        }
     }
 
+    @Test
+    public void testInvalidUserFail() throws Exception {
+        try {
+            accountService.addUser(new UserProfile("a", "a", "a"));
+        } catch (InvalidUserException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void testRemoveUser() throws Exception {
@@ -149,5 +162,18 @@ public class AccountServiceImplTest {
     public void getLocalStatus() throws Exception {
         final String result = accountService.getLocalStatus();
         assertEquals(result, "ACTIVE");
+    }
+
+    @Test
+    public void getUser() throws Exception {
+        final long userId = accountService.addUser(testUser);
+        assertNotNull(userId);
+        final UserProfile createdUser = accountService.getUser(userId);
+        assertEquals(testUser, createdUser);
+    }
+
+    @Test
+    public void getUserByLogin() throws Exception {
+
     }
 }
