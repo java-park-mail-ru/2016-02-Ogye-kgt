@@ -33,23 +33,15 @@ public class AccountServiceImplTest {
         assertNotNull(accountService.addUser(testUser));
     }
 
-    @Test
+    @Test(expected = UserExistsException.class)
     public void testAddSameUserFail() throws Exception {
         accountService.addUser(testUser);
-        try {
-            accountService.addUser(testUser);
-        } catch (UserExistsException e) {
-            e.printStackTrace();
-        }
+        accountService.addUser(testUser);
     }
 
-    @Test
+    @Test(expected = InvalidUserException.class)
     public void testInvalidUserFail() throws Exception {
-        try {
-            accountService.addUser(new UserProfile("a", "a", "a"));
-        } catch (InvalidUserException e) {
-            e.printStackTrace();
-        }
+        accountService.addUser(new UserProfile("a", "a", "a"));
     }
 
     @Test

@@ -146,22 +146,7 @@ public class AccountServiceImpl implements AccountService {
         }
         return true;
     }
-
-/*    public boolean isUserExist(UserProfile userProfile) {
-        final String login = userProfile.getLogin();
-//        for (UserProfile curUserProfile : users.values()) {
-//            if (curUserProfile.getLogin().equals(login)) return true;
-//        }
-        return false;
-    }
-
-    public boolean isUserExist(String login) {
-//        for (UserProfile curUserProfile : users.values()) {
-//            if (curUserProfile.getLogin().equals(login)) return true;
-//        }
-        return false;
-    }*/
-
+    
     private void addSession(String sessionId, UserProfile userProfile) {
         sessions.put(sessionId, userProfile);
     }

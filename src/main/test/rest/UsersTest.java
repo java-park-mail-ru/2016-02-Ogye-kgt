@@ -22,9 +22,11 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-
 public class UsersTest extends JerseyTest {
     private UserProfile testUser;
+
+    public static final int STATUS_FORBIDDEN = 403;
+    public static final int STATUS_OK = 200;
 
     @Override
     protected Application configure() {
@@ -48,6 +50,10 @@ public class UsersTest extends JerseyTest {
         return config;
     }
 
+    @Override
+    @Before
+    public void setUp() throws Exception {
+    }
 
     @Test
     public void testCreateUser() throws Exception {
@@ -56,6 +62,7 @@ public class UsersTest extends JerseyTest {
 
         final Long createdUserId = response.readEntity(UserProfile.class).getId();
         final Response getUserResponse = target("user").path(createdUserId.toString()).request().get();
+        assertEquals(STATUS_OK, getUserResponse.getStatus());
         final UserProfile createdUser = getUserResponse.readEntity(UserProfile.class);
 
         assertEquals(testUser.getLogin(), createdUser.getLogin());
@@ -65,6 +72,9 @@ public class UsersTest extends JerseyTest {
     @Test
     public void testCreateExistUserFail() throws Exception {
         final Entity<UserProfile> userEntity = Entity.entity(testUser, MediaType.APPLICATION_JSON_TYPE);
+        target("user").request().post(userEntity);
         final Response response = target("user").request().post(userEntity);
+
+        assertEquals(STATUS_FORBIDDEN, response.getStatus());
     }
 }
