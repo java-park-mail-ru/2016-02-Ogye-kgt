@@ -2,10 +2,12 @@ package services;
 
 import models.UserLoginRequest;
 import models.UserProfile;
+import org.hibernate.cfg.Configuration;
 import org.junit.Before;
 import org.junit.Test;
 import services.AccountServiceImpl.InvalidUserException;
 import services.AccountServiceImpl.UserExistsException;
+import services.config.ConfigFactory;
 
 import static org.junit.Assert.*;
 
@@ -20,7 +22,8 @@ public class AccountServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accountService = new AccountServiceImpl();
+        final Configuration config = ConfigFactory.create(ConfigFactory.TYPE.DEBUG);
+        accountService = new AccountServiceImpl(config);
         testUser = new UserProfile(TEST_LOGIN, TEST_PASS, "test@mail.ru");
         testLoginRequest = new UserLoginRequest(TEST_LOGIN, TEST_PASS);
     }

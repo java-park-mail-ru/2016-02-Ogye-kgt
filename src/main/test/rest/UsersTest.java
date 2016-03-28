@@ -9,10 +9,12 @@ import models.UserProfile;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
+import org.hibernate.cfg.Configuration;
 import org.junit.Before;
 import org.junit.Test;
 import services.AccountService;
 import services.AccountServiceImpl;
+import services.config.ConfigFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.client.Entity;
@@ -22,10 +24,15 @@ import javax.ws.rs.core.Response;
 
 
 public class UsersTest extends JerseyTest {
+    private UserProfile testUser;
+
     @Override
     protected Application configure() {
+        testUser = new UserProfile("testlogin", "qwerty", "test@mail.ru");
+
         final Context context = new Context();
-        context.put(AccountService.class, new AccountServiceImpl());
+        final Configuration configuration = ConfigFactory.create(ConfigFactory.TYPE.DEBUG);
+        context.put(AccountService.class, new AccountServiceImpl(configuration));
 
         final ResourceConfig config = new ResourceConfig(Users.class);
         final HttpServletRequest request = mock(HttpServletRequest.class);
@@ -44,7 +51,6 @@ public class UsersTest extends JerseyTest {
 
     @Test
     public void testCreateUser() throws Exception {
-        final UserProfile testUser = new UserProfile("testlogin", "qwerty", "test@mail.ru");
         final Entity<UserProfile> userEntity = Entity.entity(testUser, MediaType.APPLICATION_JSON_TYPE);
         final Response response = target("user").request().post(userEntity);
 
@@ -54,5 +60,11 @@ public class UsersTest extends JerseyTest {
 
         assertEquals(testUser.getLogin(), createdUser.getLogin());
         assertEquals(testUser.getEmail(), createdUser.getEmail());
+    }
+
+    @Test
+    public void testCreateExistUserFail() throws Exception {
+        final Entity<UserProfile> userEntity = Entity.entity(testUser, MediaType.APPLICATION_JSON_TYPE);
+        final Response response = target("user").request().post(userEntity);
     }
 }

@@ -18,23 +18,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class AccountServiceImpl implements AccountService {
-//    private Map<Long, UserProfile> users = new ConcurrentHashMap<>();
     private Map<String, UserProfile> sessions = new ConcurrentHashMap<>();
 
     private SessionFactory sessionFactory;
 
-    public AccountServiceImpl() {
-        final Configuration configuration = new Configuration();
-        configuration.addAnnotatedClass(UserProfile.class);
-
-        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
-        configuration.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
-        configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/tp_app");
-        configuration.setProperty("hibernate.connection.username", "root");
-        configuration.setProperty("hibernate.connection.password", "root");
-        configuration.setProperty("hibernate.show_sql", "true");
-        configuration.setProperty("hibernate.hbm2ddl.auto", "create");
-
+    public AccountServiceImpl(Configuration configuration) {
         sessionFactory = createSessionFactory(configuration);
     }
 
