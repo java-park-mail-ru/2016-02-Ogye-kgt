@@ -47,12 +47,12 @@ public class Users {
             return Response.status(Response.Status.OK).entity(result).build();
         } catch (UserExistsException e) {
             final JsonObject result = Json.createObjectBuilder()
-                    .add("message", "login exist")
+                    .add("message", "This user already exist.")
                     .build();
             return Response.status(Response.Status.FORBIDDEN).entity(result).build();
         } catch (InvalidUserException e) {
             final JsonObject result = Json.createObjectBuilder()
-                    .add("message", "invalid user")
+                    .add("message", "Invalid user data.")
                     .build();
             return Response.status(Response.Status.FORBIDDEN).entity(result).build();
         }

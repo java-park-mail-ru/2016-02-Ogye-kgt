@@ -64,6 +64,7 @@ public class AccountServiceImpl implements AccountService {
             transaction.commit();
         } catch (HibernateException e) {
             // todo: добавить проверку на тип исключения.
+            e.printStackTrace();
             throw new UserExistsException("User Already Exists");
         }
         return userId;

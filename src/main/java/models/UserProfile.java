@@ -2,9 +2,7 @@ package models;
 
 import org.jetbrains.annotations.NotNull;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,7 +10,6 @@ import java.util.regex.Pattern;
 @Entity
 @Table(name = "UserProfile")
 public class UserProfile {
-    private static final AtomicLong ID_GENETATOR = new AtomicLong(0);
     private static final int MIN_LOGIN_LENGTH = 3;
     private static final int MIN_PASS_LENGTH = 5;
     private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*"
@@ -24,8 +21,10 @@ public class UserProfile {
     @NotNull
     private String password;
     @NotNull
+    @Column(unique = true)
     private String email;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
 
