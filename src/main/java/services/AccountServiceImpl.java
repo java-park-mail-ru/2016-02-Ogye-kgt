@@ -202,4 +202,18 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
+    @Override
+    public boolean drop() {
+        try (Session session = sessionFactory.openSession()) {
+            final Transaction transaction = session.beginTransaction();
+            session.createSQLQuery("DROP TABLE UserProfile");
+            transaction.commit();
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
 }

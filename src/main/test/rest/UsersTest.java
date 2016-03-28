@@ -1,10 +1,6 @@
 package rest;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-
 import main.Context;
-import main.RestApplication;
 import models.UserProfile;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -16,21 +12,31 @@ import services.AccountService;
 import services.AccountServiceImpl;
 import services.config.ConfigFactory;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import java.io.StringReader;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+
 public class UsersTest extends JerseyTest {
-    private UserProfile testUser;
+    private UserProfile testUser = new UserProfile("testlogin", "qwerty", "test@mail.ru");;
+
+//    private Context context;
 
     public static final int STATUS_FORBIDDEN = 403;
     public static final int STATUS_OK = 200;
 
     @Override
     protected Application configure() {
-        testUser = new UserProfile("testlogin", "qwerty", "test@mail.ru");
+
 
         final Context context = new Context();
         final Configuration configuration = ConfigFactory.create(ConfigFactory.TYPE.DEBUG);
@@ -50,19 +56,25 @@ public class UsersTest extends JerseyTest {
         return config;
     }
 
-    @Override
+/*    @Override
     @Before
     public void setUp() throws Exception {
-    }
+//        context.get(AccountService.class).drop();
+    }*/
 
     @Test
     public void testCreateUser() throws Exception {
         final Entity<UserProfile> userEntity = Entity.entity(testUser, MediaType.APPLICATION_JSON_TYPE);
-        final Response response = target("user").request().post(userEntity);
 
-        final Long createdUserId = response.readEntity(UserProfile.class).getId();
-        final Response getUserResponse = target("user").path(createdUserId.toString()).request().get();
-        assertEquals(STATUS_OK, getUserResponse.getStatus());
+        final Response response = target("user").request().post(userEntity);
+        assertEquals(STATUS_OK, response.getStatus());
+
+        final String resp = response.readEntity(String.class);
+        final JsonReader jsonReader = Json.createReader(new StringReader(resp));
+        final JsonObject jsonResponse = jsonReader.readObject();
+        final long id = jsonResponse.getInt("id");
+
+        final Response getUserResponse = target("user").path(Long.toString(id)).request().get();
         final UserProfile createdUser = getUserResponse.readEntity(UserProfile.class);
 
         assertEquals(testUser.getLogin(), createdUser.getLogin());

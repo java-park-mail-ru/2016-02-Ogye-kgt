@@ -28,4 +28,6 @@ public interface AccountService {
 
     boolean doLogout(String sessionId);
 
+    boolean drop();
+
 }

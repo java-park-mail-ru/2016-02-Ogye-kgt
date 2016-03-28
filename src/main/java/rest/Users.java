@@ -54,7 +54,7 @@ public class Users {
             final JsonObject result = Json.createObjectBuilder()
                     .add("message", "Invalid user data.")
                     .build();
-            return Response.status(Response.Status.FORBIDDEN).entity(result).build();
+            return Response.status(Response.Status.PAYMENT_REQUIRED).entity(result).build();
         }
     }
 

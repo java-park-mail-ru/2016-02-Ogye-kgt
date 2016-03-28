@@ -19,7 +19,7 @@ public class ConfigFactory {
         configuration.setProperty("hibernate.show_sql", "true");
         if (type == TYPE.DEBUG) {
             configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/tp_app_debug");
-            configuration.setProperty("hibernate.hbm2ddl.auto", "create-drop");
+            configuration.setProperty("hibernate.hbm2ddl.auto", "create");
         } else if (type == TYPE.PRODUCTION) {
             configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/tp_app");
             configuration.setProperty("hibernate.hbm2ddl.auto", "update");
