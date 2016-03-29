@@ -33,6 +33,8 @@ public class RestTest extends JerseyTest {
     public static final UserProfile testUser = new UserProfile("testlogin", "qwerty", "test@mail.ru");
     public static final UserLoginRequest userLoginRequest = new UserLoginRequest(testUser.getLogin(), testUser.getPassword());
 
+    public static final int STATUS_NOT_FOUND = 400;
+    public static final int STATUS_UNAUTHORIZED = 401;
     public static final int STATUS_FORBIDDEN = 403;
     public static final int STATUS_OK = 200;
 
@@ -61,7 +63,11 @@ public class RestTest extends JerseyTest {
     }
 
     public long addUser() {
-        final Entity<UserProfile> userEntity = Entity.entity(testUser, MediaType.APPLICATION_JSON_TYPE);
+        return addUser(testUser);
+    }
+
+    public long addUser(UserProfile user) {
+        final Entity<UserProfile> userEntity = Entity.entity(user, MediaType.APPLICATION_JSON_TYPE);
 
         final Response response = target("user").request().post(userEntity);
         assertEquals(STATUS_OK, response.getStatus());
@@ -82,8 +88,19 @@ public class RestTest extends JerseyTest {
         assertEquals(testUser.getEmail(), createdUser.getEmail());
     }
 
+
     public UserProfile getUser(long id) {
         final Response getUserResponse = target("user").path(Long.toString(id)).request().get();
         return getUserResponse.readEntity(UserProfile.class);
+    }
+
+    public Response login(UserProfile user) {
+        final UserLoginRequest loginRequest = new UserLoginRequest(user.getLogin(), user.getPassword());
+        final Entity<UserLoginRequest> userLoginReqEntity = Entity.entity(loginRequest, MediaType.APPLICATION_JSON_TYPE);
+        return target("session").request().put(userLoginReqEntity);
+    }
+
+    public Response checkAuth(String session) {
+        return target("session").request().cookie("JSESSIONID", session).get();
     }
 }

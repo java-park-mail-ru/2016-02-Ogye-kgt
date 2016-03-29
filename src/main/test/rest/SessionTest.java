@@ -3,6 +3,7 @@ package rest;
 import models.UserLoginRequest;
 import models.UserProfile;
 import org.junit.Test;
+import services.AccountServiceImplTest;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -19,9 +20,17 @@ public class SessionTest extends RestTest {
 
     @Test
     public void testCheckAuth() throws Exception {
-        final long id = addUser();
-        final Response resp = target("sessioin").request().get();
+        addUser(testUser);
+        login(testUser);
+        final Response resp = checkAuth(AccountServiceImplTest.TEST_SESSION_ID);
+        assertEquals(STATUS_OK, resp.getStatus());
+    }
 
+    @Test
+    public void testCheckFail() throws Exception {
+        addUser(testUser);
+        final Response resp = checkAuth(AccountServiceImplTest.TEST_SESSION_ID);
+        assertEquals(STATUS_UNAUTHORIZED, resp.getStatus());
     }
 
     @Test
@@ -36,6 +45,19 @@ public class SessionTest extends RestTest {
         final JsonReader jsonReader = Json.createReader(new StringReader(resp));
         final JsonObject jsonResponse = jsonReader.readObject();
         assertEquals(id, jsonResponse.getInt("id"));
+    }
+
+    @Test
+    public void testLogin() throws Exception {
+        addUser(testUser);
+        final Response resp = login(testUser);
+        assertEquals(STATUS_OK, resp.getStatus());
+    }
+
+    @Test
+    public void testLoginFail() throws Exception {
+        final Response resp = login(testUser);
+        assertEquals(STATUS_NOT_FOUND, resp.getStatus());
     }
 
     @Test
