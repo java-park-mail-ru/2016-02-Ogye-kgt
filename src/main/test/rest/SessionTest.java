@@ -1,38 +1,41 @@
 package rest;
 
-import main.Context;
-import main.RestApplication;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.test.JerseyTest;
-import org.hibernate.cfg.Configuration;
+import models.UserLoginRequest;
+import models.UserProfile;
 import org.junit.Test;
-import services.AccountService;
-import services.AccountServiceImpl;
-import services.config.ConfigFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Application;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.StringReader;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertEquals;
 
-/**
- * Created by gantz on 13.03.16.
- */
-public class SessionTest extends RestTest{
+
+public class SessionTest extends RestTest {
 
     @Test
     public void testCheckAuth() throws Exception {
         final long id = addUser();
         final Response resp = target("sessioin").request().get();
-//        assert();
+
     }
 
     @Test
     public void testUserLogin() throws Exception {
+        final long id = addUser();
+        final Entity<UserLoginRequest> userLoginReqEntity = Entity.entity(userLoginRequest, MediaType.APPLICATION_JSON_TYPE);
 
+        final Response response = target("session").request().put(userLoginReqEntity);
+        assertEquals(STATUS_OK, response.getStatus());
+
+        final String resp = response.readEntity(String.class);
+        final JsonReader jsonReader = Json.createReader(new StringReader(resp));
+        final JsonObject jsonResponse = jsonReader.readObject();
+        assertEquals(id, jsonResponse.getInt("id"));
     }
 
     @Test

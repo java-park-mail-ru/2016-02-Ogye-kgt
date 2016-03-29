@@ -1,6 +1,7 @@
 package rest;
 
 import main.Context;
+import models.UserLoginRequest;
 import models.UserProfile;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -8,12 +9,14 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.hibernate.cfg.Configuration;
 import services.AccountService;
 import services.AccountServiceImpl;
+import services.AccountServiceImplTest;
 import services.config.ConfigFactory;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
@@ -23,11 +26,12 @@ import java.io.StringReader;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 public class RestTest extends JerseyTest {
     public static final UserProfile testUser = new UserProfile("testlogin", "qwerty", "test@mail.ru");
-
+    public static final UserLoginRequest userLoginRequest = new UserLoginRequest(testUser.getLogin(), testUser.getPassword());
 
     public static final int STATUS_FORBIDDEN = 403;
     public static final int STATUS_OK = 200;
@@ -39,8 +43,11 @@ public class RestTest extends JerseyTest {
         final Configuration configuration = ConfigFactory.create(ConfigFactory.TYPE.DEBUG);
         context.put(AccountService.class, new AccountServiceImpl(configuration));
 
-        final ResourceConfig config = new ResourceConfig(Users.class);
+        final ResourceConfig config = new ResourceConfig(Users.class, Session.class);
         final HttpServletRequest request = mock(HttpServletRequest.class);
+        final HttpSession mockSession = mock(HttpSession.class);
+        when(request.getSession()).thenReturn(mockSession);
+        when(mockSession.getId()).thenReturn(AccountServiceImplTest.TEST_SESSION_ID);
         //noinspection AnonymousInnerClassMayBeStatic
         config.register(new AbstractBinder() {
             @Override

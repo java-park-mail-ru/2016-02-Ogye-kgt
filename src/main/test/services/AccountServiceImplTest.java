@@ -15,7 +15,7 @@ public class AccountServiceImplTest {
     private AccountServiceImpl accountService;
     private UserProfile testUser;
     private UserLoginRequest testLoginRequest;
-    private static final String TEST_SESSION_ID = "bjvs7ieafcl8ub8qk0ur9ts0";
+    public static final String TEST_SESSION_ID = "bjvs7ieafcl8ub8qk0ur9ts0";
     private static final String INVALID_SESSION_ID = "000000000000000000000000";
     private static final String TEST_LOGIN = "testlogin";
     private static final String TEST_PASS = "testpass";
