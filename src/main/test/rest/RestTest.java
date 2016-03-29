@@ -33,7 +33,7 @@ public class RestTest extends JerseyTest {
     public static final UserProfile testUser = new UserProfile("testlogin", "qwerty", "test@mail.ru");
     public static final UserLoginRequest userLoginRequest = new UserLoginRequest(testUser.getLogin(), testUser.getPassword());
 
-    public static final int STATUS_NOT_FOUND = 400;
+    public static final int STATUS_NOT_FOUND = 404;
     public static final int STATUS_UNAUTHORIZED = 401;
     public static final int STATUS_FORBIDDEN = 403;
     public static final int STATUS_OK = 200;

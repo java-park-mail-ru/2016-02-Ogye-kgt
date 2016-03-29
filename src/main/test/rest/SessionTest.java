@@ -62,6 +62,11 @@ public class SessionTest extends RestTest {
 
     @Test
     public void testUserLogout() throws Exception {
-
+        addUser(testUser);
+        login(testUser);
+        Response resp = target("session").request().delete();
+        assertEquals(STATUS_OK, resp.getStatus());
+        resp = checkAuth(AccountServiceImplTest.TEST_SESSION_ID);
+        assertEquals(STATUS_UNAUTHORIZED, resp.getStatus());
     }
 }
