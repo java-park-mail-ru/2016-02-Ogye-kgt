@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 public class RestTest extends JerseyTest {
     public static final UserProfile testUser = new UserProfile("testlogin", "qwerty", "test@mail.ru");
     public static final UserLoginRequest userLoginRequest = new UserLoginRequest(testUser.getLogin(), testUser.getPassword());
-
+    public static final Entity<UserProfile> userEntity = Entity.entity(testUser, MediaType.APPLICATION_JSON_TYPE);
     public static final int STATUS_NOT_FOUND = 404;
     public static final int STATUS_UNAUTHORIZED = 401;
     public static final int STATUS_FORBIDDEN = 403;
@@ -67,7 +67,7 @@ public class RestTest extends JerseyTest {
     }
 
     public long addUser(UserProfile user) {
-        final Entity<UserProfile> userEntity = Entity.entity(user, MediaType.APPLICATION_JSON_TYPE);
+//        final Entity<UserProfile> userEntity = Entity.entity(user, MediaType.APPLICATION_JSON_TYPE);
 
         final Response response = target("user").request().post(userEntity);
         assertEquals(STATUS_OK, response.getStatus());
@@ -98,6 +98,10 @@ public class RestTest extends JerseyTest {
         final UserLoginRequest loginRequest = new UserLoginRequest(user.getLogin(), user.getPassword());
         final Entity<UserLoginRequest> userLoginReqEntity = Entity.entity(loginRequest, MediaType.APPLICATION_JSON_TYPE);
         return target("session").request().put(userLoginReqEntity);
+    }
+
+    public Response checkAuth() {
+        return target("session").request().get();
     }
 
     public Response checkAuth(String session) {

@@ -2,12 +2,14 @@ package rest;
 
 import models.UserProfile;
 import org.junit.Test;
+import services.AccountServiceImplTest;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class UsersTest extends RestTest {
 
@@ -18,8 +20,8 @@ public class UsersTest extends RestTest {
 
     @Test
     public void testCreateExistUserFail() throws Exception {
+        addUser(testUser);
         final Entity<UserProfile> userEntity = Entity.entity(testUser, MediaType.APPLICATION_JSON_TYPE);
-        target("user").request().post(userEntity);
         final Response response = target("user").request().post(userEntity);
 
         assertEquals(STATUS_FORBIDDEN, response.getStatus());
@@ -32,18 +34,42 @@ public class UsersTest extends RestTest {
     }
 
     @Test
-    public void deleteUserById() throws Exception {
-        final long id = addUser();
+    public void deleteUserForbidden() throws Exception {
+        final long id = addUser(testUser);
         final Response response = target("user").path(Long.toString(id)).request().delete();
         assertEquals(STATUS_FORBIDDEN, response.getStatus());
+    }
 
-//        final Response getUserResponse = target("user").path(Long.toString(id)).request().get();
-//        assertEquals(STATUS_FORBIDDEN, getUserResponse.getStatus());
+    @Test
+    public void deleteUser() throws Exception {
+        final long id = addUser(testUser);
+        login(testUser);
+        final Response resp = target("user").path(Long.toString(id)).request().delete();
+        assertEquals(STATUS_OK, resp.getStatus());
+        final UserProfile emptyUser = getUser(id);
+        assertNull(emptyUser);
     }
 
     @Test
     public void updateUser() throws Exception {
+        final long id = addUser(testUser);
+        login(testUser);
+        final UserProfile newProfile = new UserProfile("newLogin", "newPassword", "new@mail.ru");
+        final Entity<UserProfile> newProfileEntity = Entity.entity(newProfile, MediaType.APPLICATION_JSON_TYPE);
+        final Response resp = target("user").path(Long.toString(id)).request().put(newProfileEntity);
+        assertEquals(STATUS_OK, resp.getStatus());
+        final UserProfile updatedProfile = getUser(id);
+        assertEquals(newProfile.getEmail(), updatedProfile.getEmail());
+        assertEquals(newProfile.getLogin(), updatedProfile.getLogin());
+    }
 
+    @Test
+    public void updateUserForbidden() throws Exception {
+        final long id = addUser(testUser);
+        final UserProfile newProfile = new UserProfile("newLogin", "newPassword", "new@mail.ru");
+        final Entity<UserProfile> newProfileEntity = Entity.entity(newProfile, MediaType.APPLICATION_JSON_TYPE);
+        final Response resp = target("user").path(Long.toString(id)).request().put(newProfileEntity);
+        assertEquals(STATUS_FORBIDDEN, resp.getStatus());
     }
 
 
