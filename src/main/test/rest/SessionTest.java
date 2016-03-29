@@ -13,6 +13,7 @@ import services.config.ConfigFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Response;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -24,7 +25,9 @@ public class SessionTest extends RestTest{
 
     @Test
     public void testCheckAuth() throws Exception {
-
+        final long id = addUser();
+        final Response resp = target("sessioin").request().get();
+//        assert();
     }
 
     @Test

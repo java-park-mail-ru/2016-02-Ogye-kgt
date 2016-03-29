@@ -7,6 +7,7 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.hibernate.cfg.Configuration;
+import rest.Session;
 import rest.Users;
 import services.AccountService;
 import services.AccountServiceImpl;
@@ -33,7 +34,7 @@ public class Main {
         final Configuration configuration = ConfigFactory.create(ConfigFactory.TYPE.PRODUCTION);
         context.put(AccountService.class, new AccountServiceImpl(configuration));
 
-        final ResourceConfig config = new ResourceConfig(Users.class);
+        final ResourceConfig config = new ResourceConfig(Users.class, Session.class);
         config.register(new AbstractBinder() {
             @Override
             protected void configure() {
