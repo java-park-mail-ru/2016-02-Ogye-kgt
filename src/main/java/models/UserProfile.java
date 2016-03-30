@@ -14,7 +14,9 @@ public class UserProfile {
     private static final int MIN_PASS_LENGTH = 5;
     private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*"
             + "@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-    private static Pattern emailPattern;
+//    private static Pattern emailPattern;
+    @NotNull
+    private static final Pattern emailPattern = Pattern.compile(EMAIL_PATTERN);
 
     @NotNull
     @Column(unique = true)
@@ -89,9 +91,6 @@ public class UserProfile {
 
     public static boolean isEmailValid(String email) {
         if (email == null) return false;
-        if (emailPattern == null) {
-            emailPattern = Pattern.compile(EMAIL_PATTERN);
-        }
         final Matcher emailMatcher = emailPattern.matcher(email);
         return emailMatcher.matches();
     }
