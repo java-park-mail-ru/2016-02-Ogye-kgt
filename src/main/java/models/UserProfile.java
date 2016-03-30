@@ -3,7 +3,6 @@ package models;
 import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.*;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,11 +11,10 @@ import java.util.regex.Pattern;
 public class UserProfile {
     private static final int MIN_LOGIN_LENGTH = 3;
     private static final int MIN_PASS_LENGTH = 5;
-    private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*"
+    private static final String EMAIL_REGEXP = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*"
             + "@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-//    private static Pattern emailPattern;
     @NotNull
-    private static final Pattern emailPattern = Pattern.compile(EMAIL_PATTERN);
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEXP);
 
     @NotNull
     @Column(unique = true)
@@ -75,7 +73,8 @@ public class UserProfile {
         return id;
     }
 
-    public void setId() {}
+    public void setId() {
+    }
 
     public static boolean isLoginValid(String login) {
         if (login == null) return false;
@@ -91,7 +90,7 @@ public class UserProfile {
 
     public static boolean isEmailValid(String email) {
         if (email == null) return false;
-        final Matcher emailMatcher = emailPattern.matcher(email);
+        final Matcher emailMatcher = EMAIL_PATTERN.matcher(email);
         return emailMatcher.matches();
     }
 
