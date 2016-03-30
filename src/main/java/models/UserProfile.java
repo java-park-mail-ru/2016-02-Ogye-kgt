@@ -17,6 +17,7 @@ public class UserProfile {
     private static Pattern emailPattern;
 
     @NotNull
+    @Column(unique = true)
     private String login;
     @NotNull
     private String password;

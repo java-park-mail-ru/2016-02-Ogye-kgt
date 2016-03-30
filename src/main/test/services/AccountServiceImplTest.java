@@ -39,6 +39,12 @@ public class AccountServiceImplTest {
         accountService.addUser(testUser);
     }
 
+    @Test(expected = UserExistsException.class)
+    public void testAddSameLoginFail() throws Exception {
+        accountService.addUser(testUser);
+        accountService.addUser(new UserProfile(testUser.getLogin(), "password", "another@mail.ru"));
+    }
+
     @Test(expected = InvalidUserException.class)
     public void testInvalidUserFail() throws Exception {
         accountService.addUser(new UserProfile("a", "a", "a"));

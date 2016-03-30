@@ -67,7 +67,6 @@ public class RestTest extends JerseyTest {
     }
 
     public long addUser(UserProfile user) {
-//        final Entity<UserProfile> userEntity = Entity.entity(user, MediaType.APPLICATION_JSON_TYPE);
 
         final Response response = target("user").request().post(userEntity);
         assertEquals(STATUS_OK, response.getStatus());
