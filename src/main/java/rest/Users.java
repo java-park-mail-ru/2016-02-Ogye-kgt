@@ -3,9 +3,8 @@ package rest;
 import models.ForbiddenResponse;
 import models.UserProfile;
 import services.AccountService;
-import services.AccountServiceImpl;
 import services.AccountServiceImpl.InvalidUserException;
-import services.AccountServiceImpl.UserExistsException;
+import services.AccountServiceImpl.DatabaseException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -45,7 +44,7 @@ public class Users {
             final JsonObject result = Json.createObjectBuilder()
                     .add("id", user.getId()).build();
             return Response.status(Response.Status.OK).entity(result).build();
-        } catch (UserExistsException e) {
+        } catch (DatabaseException e) {
             final JsonObject result = Json.createObjectBuilder()
                     .add("message", "This user already exist.")
                     .build();
