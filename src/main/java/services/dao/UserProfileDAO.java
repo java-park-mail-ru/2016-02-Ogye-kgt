@@ -41,4 +41,5 @@ public class UserProfileDAO {
         final Criteria criteria = session.createCriteria(UserProfile.class);
         return (List<UserProfile>) criteria.list();
     }
+
 }

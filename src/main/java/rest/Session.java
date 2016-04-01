@@ -15,6 +15,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.crypto.Data;
 
 
 @Singleton
@@ -44,16 +45,18 @@ public class Session {
     @Produces(MediaType.APPLICATION_JSON)
     public Response userLogin(UserLoginRequest userLoginRequest, @Context HttpServletRequest request) {
         final AccountService accountService = context.get(AccountService.class);
-        JsonObject result = Json.createObjectBuilder().build();
         final String sessionId = request.getSession().getId();
-        final UserProfile userProfile = accountService.doLogin(sessionId, userLoginRequest);
-        if (userProfile != null) {
-            result = Json.createObjectBuilder()
+        // todo: check user exist
+        // return Response.status(Response.Status.NOT_FOUND).entity(result).build();
+        try {
+            final UserProfile userProfile = accountService.doLogin(sessionId, userLoginRequest);
+            final JsonObject result = Json.createObjectBuilder()
                     .add("id", userProfile.getId())
                     .build();
             return Response.status(Response.Status.OK).entity(result).build();
+        } catch (AccountServiceImpl.DatabaseException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
-        return Response.status(Response.Status.NOT_FOUND).entity(result).build();
     }
 
     @DELETE

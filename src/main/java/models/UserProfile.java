@@ -98,6 +98,8 @@ public class UserProfile {
         return isLoginValid(login) && isEmailValid(email) && isPasswordValid(password);
     }
 
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

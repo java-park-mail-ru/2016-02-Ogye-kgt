@@ -6,7 +6,7 @@ import org.hibernate.cfg.Configuration;
 import org.junit.Before;
 import org.junit.Test;
 import services.AccountServiceImpl.InvalidUserException;
-import services.AccountServiceImpl.UserExistsException;
+import services.AccountServiceImpl.DatabaseException;
 import services.config.ConfigFactory;
 
 import static org.junit.Assert.*;
@@ -33,13 +33,13 @@ public class AccountServiceImplTest {
         assertNotNull(accountService.addUser(testUser));
     }
 
-    @Test(expected = UserExistsException.class)
+    @Test(expected = DatabaseException.class)
     public void testAddSameUserFail() throws Exception {
         accountService.addUser(testUser);
         accountService.addUser(testUser);
     }
 
-    @Test(expected = UserExistsException.class)
+    @Test(expected = DatabaseException.class)
     public void testAddSameLoginFail() throws Exception {
         accountService.addUser(testUser);
         accountService.addUser(new UserProfile(testUser.getLogin(), "password", "another@mail.ru"));

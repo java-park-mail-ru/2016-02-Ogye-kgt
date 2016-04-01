@@ -1,5 +1,6 @@
 package services;
 
+import com.sun.istack.internal.NotNull;
 import models.UserLoginRequest;
 import models.UserProfile;
 import org.hibernate.HibernateException;
@@ -8,6 +9,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.service.ServiceRegistry;
 import org.jetbrains.annotations.Nullable;
 import services.dao.UserProfileDAO;
@@ -18,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class AccountServiceImpl implements AccountService {
+    // todo: заменить UserProfile на id.
     private Map<String, UserProfile> sessions = new ConcurrentHashMap<>();
 
     private SessionFactory sessionFactory;
@@ -25,6 +28,30 @@ public class AccountServiceImpl implements AccountService {
     public AccountServiceImpl(Configuration configuration) {
         sessionFactory = createSessionFactory(configuration);
     }
+
+    @FunctionalInterface
+    public interface HibernateUnit<T> {
+        T operate(Session session);
+    }
+
+    public <T> T doInSession(@NotNull HibernateUnit<T> work) throws DatabaseException {
+        final Session session = sessionFactory.openSession();
+        try {
+            session.getTransaction().begin();
+            final T result = work.operate(session);
+            session.getTransaction().commit();
+            return result;
+        } catch (RuntimeException e) {
+            if (session.getTransaction().getStatus() == TransactionStatus.ACTIVE
+                    || session.getTransaction().getStatus() == TransactionStatus.MARKED_ROLLBACK) {
+                session.getTransaction().rollback();
+            }
+            throw new DatabaseException("Fail to perform database transaction", e);
+        } finally {
+            session.close();
+        }
+    }
+
 
     @Override
     public String getLocalStatus() {
@@ -40,59 +67,37 @@ public class AccountServiceImpl implements AccountService {
     // FIXME: тестовый метод, не выкладывать в прод.
     @Override
     @Nullable
-    public Collection<UserProfile> getAllUsers() {
-        final Collection<UserProfile> users;
-        try (Session session = sessionFactory.openSession()) {
-            final Transaction transaction = session.beginTransaction();
+    public Collection<UserProfile> getAllUsers() throws DatabaseException {
+        return doInSession((session) -> {
             final UserProfileDAO dao = new UserProfileDAO(session);
-            users = dao.readAll();
-            transaction.commit();
-        }
-        return users;
+            return dao.readAll();
+        });
     }
 
     @Override
-    public long addUser(UserProfile userProfile) throws UserExistsException, InvalidUserException {
-        if (!userProfile.isValid()) {
-            throw new InvalidUserException("Invalid User");
-        }
-        final long userId;
-        try (Session session = sessionFactory.openSession()) {
-            final Transaction transaction = session.beginTransaction();
+    public long addUser(UserProfile userProfile) throws DatabaseException {
+        return doInSession((session) -> {
             final UserProfileDAO dao = new UserProfileDAO(session);
-            userId = dao.save(userProfile);
-            transaction.commit();
-        } catch (HibernateException e) {
-            // todo: добавить проверку на тип исключения.
-            e.printStackTrace();
-            throw new UserExistsException("User Already Exists");
-        }
-        return userId;
+            return dao.save(userProfile);
+        });
     }
+
 
     @Override
     @Nullable
-    public UserProfile getUser(long userId) {
-        final UserProfile userProfile;
-        try (Session session = sessionFactory.openSession()) {
-            final Transaction transaction = session.beginTransaction();
+    public UserProfile getUser(long userId) throws DatabaseException {
+        return doInSession((session) -> {
             final UserProfileDAO dao = new UserProfileDAO(session);
-            userProfile = dao.read(userId);
-            transaction.commit();
-        }
-        return userProfile;
+            return dao.read(userId);
+        });
     }
 
     @Nullable
-    public UserProfile getUserByLogin(String login) {
-        final UserProfile userProfile;
-        try (Session session = sessionFactory.openSession()) {
-            final Transaction transaction = session.beginTransaction();
+    public UserProfile getUserByLogin(String login) throws DatabaseException {
+        return doInSession((session) -> {
             final UserProfileDAO dao = new UserProfileDAO(session);
-            userProfile = dao.readByName(login);
-            transaction.commit();
-        }
-        return userProfile;
+            return dao.readByName(login);
+        });
     }
 
     @Override
@@ -146,7 +151,7 @@ public class AccountServiceImpl implements AccountService {
         }
         return true;
     }
-    
+
     private void addSession(String sessionId, UserProfile userProfile) {
         sessions.put(sessionId, userProfile);
     }
@@ -162,7 +167,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Nullable
-    public UserProfile doLogin(String sessionId, UserLoginRequest user) {
+    public UserProfile doLogin(String sessionId, UserLoginRequest user) throws DatabaseException {
         final String login = user.getLogin();
         final UserProfile userProfile = getUserByLogin(login);
         if (userProfile == null) return null;
@@ -190,9 +195,13 @@ public class AccountServiceImpl implements AccountService {
         return configuration.buildSessionFactory(serviceRegistry);
     }
 
-    public static class UserExistsException extends Exception {
-        public UserExistsException(String message) {
+    public static class DatabaseException extends Exception {
+        public DatabaseException(String message) {
             super(message);
+        }
+
+        public DatabaseException(String message, Throwable cause) {
+            super(message, cause);
         }
     }
 
