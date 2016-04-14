@@ -21,8 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class AccountServiceImpl implements AccountService {
-    // todo: заменить UserProfile на id.
-    private Map<String, UserProfile> sessions = new ConcurrentHashMap<>();
     private Map<String, Long> sessionsId = new ConcurrentHashMap<>();
 
     private SessionFactory sessionFactory;
@@ -104,8 +102,15 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Nullable
     public UserProfile getUserBySession(String sessionId) {
-        return sessions.get(sessionId);
+        try {
+            final long userId = sessionsId.get(sessionId);
+            final UserProfile userProfile = getUser(userId);
+            return userProfile;
+        } catch (DatabaseException | NullPointerException e) {
+            return null;
+        }
     }
 
     @Override
@@ -124,7 +129,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public boolean removeUser(String sessionId, long userId) {
-        final UserProfile userProfile = sessions.get(sessionId);
+        final UserProfile userProfile = getUserBySession(sessionId);
         if (userProfile == null) return false;
         if (userProfile.getId() != userId) return false;
         return removeUser(userId);
@@ -156,16 +161,16 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private void addSession(String sessionId, UserProfile userProfile) {
-        sessions.put(sessionId, userProfile);
+        sessionsId.put(sessionId, userProfile.getId());
     }
 
     private void closeSession(String sessionId) {
-        sessions.remove(sessionId);
+        sessionsId.remove(sessionId);
     }
 
     @Override
     public boolean isAuthorised(String sessioinId) {
-        return sessions.containsKey(sessioinId);
+        return sessionsId.containsKey(sessioinId);
     }
 
     public long checkAuth(String sessionId) {
@@ -191,7 +196,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public boolean doLogout(String sessionId) {
-        if (getUserBySession(sessionId) == null) return false;
+        if (sessionsId.get(sessionId) == null) return false;
         closeSession(sessionId);
         return true;
     }
