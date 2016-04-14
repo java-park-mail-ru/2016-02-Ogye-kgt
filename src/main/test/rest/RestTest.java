@@ -67,14 +67,18 @@ public class RestTest extends JerseyTest {
     }
 
     public long addUser(UserProfile user) {
-
-        final Response response = target("user").request().post(userEntity);
+        final Response response = addUserRequest(user);
         assertEquals(STATUS_OK, response.getStatus());
 
         final String resp = response.readEntity(String.class);
         final JsonReader jsonReader = Json.createReader(new StringReader(resp));
         final JsonObject jsonResponse = jsonReader.readObject();
         return jsonResponse.getInt("id");
+    }
+
+    public Response addUserRequest(UserProfile user) {
+        final Entity<UserProfile> newUserEntity = Entity.entity(user, MediaType.APPLICATION_JSON_TYPE);
+        return target("user").request().post(newUserEntity);
     }
 
     public void createAndGetUser() {

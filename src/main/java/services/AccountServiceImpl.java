@@ -1,6 +1,7 @@
 package services;
 
 import com.sun.istack.internal.NotNull;
+import com.sun.xml.internal.ws.client.sei.ResponseBuilder;
 import models.UserLoginRequest;
 import models.UserProfile;
 import org.hibernate.HibernateException;
@@ -22,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AccountServiceImpl implements AccountService {
     // todo: заменить UserProfile на id.
     private Map<String, UserProfile> sessions = new ConcurrentHashMap<>();
+    private Map<String, Long> sessionsId = new ConcurrentHashMap<>();
 
     private SessionFactory sessionFactory;
 
@@ -92,6 +94,7 @@ public class AccountServiceImpl implements AccountService {
         });
     }
 
+    @Override
     @Nullable
     public UserProfile getUserByLogin(String login) throws DatabaseException {
         return doInSession((session) -> {
@@ -107,16 +110,16 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public boolean removeUser(long userId) {
-        try (Session session = sessionFactory.openSession()) {
-            final Transaction transaction = session.beginTransaction();
-            final UserProfileDAO dao = new UserProfileDAO(session);
-            dao.delete(userId);
-            transaction.commit();
-        } catch (HibernateException e) {
+        try {
+            return doInSession((session) -> {
+                final UserProfileDAO dao = new UserProfileDAO(session);
+                dao.delete(userId);
+                return true;
+            });
+        } catch (DatabaseException e) {
             e.printStackTrace();
             return false;
         }
-        return true;
     }
 
     @Override
@@ -164,6 +167,11 @@ public class AccountServiceImpl implements AccountService {
     public boolean isAuthorised(String sessioinId) {
         return sessions.containsKey(sessioinId);
     }
+
+    public long checkAuth(String sessionId) {
+        return sessionsId.get(sessionId);
+    }
+
 
     @Override
     @Nullable

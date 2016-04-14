@@ -1,9 +1,11 @@
 package rest;
 
 import models.UserProfile;
+import org.glassfish.jersey.message.internal.MessageBodyProviderNotFoundException;
 import org.junit.Test;
 import services.AccountServiceImplTest;
 
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -16,6 +18,12 @@ public class UsersTest extends RestTest {
     @Test
     public void testCreateUser() throws Exception {
         createAndGetUser();
+    }
+
+    @Test
+    public void testCreateInvalidUser() throws Exception {
+        final Response resp = addUserRequest(new UserProfile("a", "b", "c"));
+        assertEquals(STATUS_FORBIDDEN, resp.getStatus());
     }
 
     @Test
@@ -40,14 +48,13 @@ public class UsersTest extends RestTest {
         assertEquals(STATUS_FORBIDDEN, response.getStatus());
     }
 
-    @Test
+    @Test(expected = MessageBodyProviderNotFoundException.class)
     public void deleteUser() throws Exception {
         final long id = addUser(testUser);
         login(testUser);
         final Response resp = target("user").path(Long.toString(id)).request().delete();
         assertEquals(STATUS_OK, resp.getStatus());
-        final UserProfile emptyUser = getUser(id);
-        assertNull(emptyUser);
+        getUser(id);
     }
 
     @Test

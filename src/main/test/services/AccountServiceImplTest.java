@@ -45,11 +45,6 @@ public class AccountServiceImplTest {
         accountService.addUser(new UserProfile(testUser.getLogin(), "password", "another@mail.ru"));
     }
 
-    @Test(expected = InvalidUserException.class)
-    public void testInvalidUserFail() throws Exception {
-        accountService.addUser(new UserProfile("a", "a", "a"));
-    }
-
     @Test
     public void testRemoveUser() throws Exception {
         final long userId = accountService.addUser(testUser);

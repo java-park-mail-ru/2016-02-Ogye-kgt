@@ -12,6 +12,8 @@ public interface AccountService {
 
     UserProfile getUser(long userId) throws AccountServiceImpl.DatabaseException;
 
+    UserProfile getUserByLogin(String login) throws AccountServiceImpl.DatabaseException;
+
     Collection<UserProfile> getAllUsers() throws AccountServiceImpl.DatabaseException;
 
     boolean removeUser(long userId) throws AccountServiceImpl.DatabaseException;

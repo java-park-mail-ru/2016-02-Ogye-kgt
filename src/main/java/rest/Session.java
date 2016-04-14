@@ -46,8 +46,13 @@ public class Session {
     public Response userLogin(UserLoginRequest userLoginRequest, @Context HttpServletRequest request) {
         final AccountService accountService = context.get(AccountService.class);
         final String sessionId = request.getSession().getId();
-        // todo: check user exist
-        // return Response.status(Response.Status.NOT_FOUND).entity(result).build();
+        // Check user exist.
+        try {
+            accountService.getUserByLogin(userLoginRequest.getLogin());
+        } catch (AccountServiceImpl.DatabaseException e) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
         try {
             final UserProfile userProfile = accountService.doLogin(sessionId, userLoginRequest);
             final JsonObject result = Json.createObjectBuilder()
