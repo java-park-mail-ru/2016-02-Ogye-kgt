@@ -13,17 +13,36 @@ import services.AccountService;
 import services.AccountServiceImpl;
 import services.config.ConfigFactory;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
+
 
 public class Main {
     @SuppressWarnings("OverlyBroadThrowsClause")
     public static void main(String[] args) throws Exception {
         int port = -1;
-        if (args.length == 1) {
+        String host = "localhost";
+        // Читаем параметры.
+        try (final FileInputStream fis = new FileInputStream("config/server.properties")) {
+            final Properties properties = new Properties();
+            properties.load(fis);
+
+            port = Integer.parseInt(properties.getProperty("port"));
+            host = properties.getProperty("host");
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            System.err.println("Property file not found.");
+        }
+
+        /*if (args.length == 1) {
             port = Integer.valueOf(args[0]);
         } else {
             System.err.println("Specify port");
             System.exit(1);
-        }
+        }*/
 
         System.out.append("Starting at port: ").append(String.valueOf(port)).append('\n');
 
