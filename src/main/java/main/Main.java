@@ -37,13 +37,7 @@ public class Main {
             System.err.println("Property file not found.");
         }
 
-        /*if (args.length == 1) {
-            port = Integer.valueOf(args[0]);
-        } else {
-            System.err.println("Specify port");
-            System.exit(1);
-        }*/
-
+        
         System.out.append("Starting at port: ").append(String.valueOf(port)).append('\n');
 
         final Server server = new Server(port);
