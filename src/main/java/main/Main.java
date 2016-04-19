@@ -1,5 +1,6 @@
 package main;
 
+import mechanics.WebSocketGameServlet;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -11,6 +12,8 @@ import rest.Session;
 import rest.Users;
 import services.AccountService;
 import services.AccountServiceImpl;
+import services.WebSocketService;
+import services.WebSocketServiceImpl;
 import services.config.ConfigFactory;
 
 import java.io.FileInputStream;
@@ -37,7 +40,7 @@ public class Main {
             System.err.println("Property file not found.");
         }
 
-        
+
         System.out.append("Starting at port: ").append(String.valueOf(port)).append('\n');
 
         final Server server = new Server(port);
@@ -46,6 +49,7 @@ public class Main {
         final Context context = new Context();
         final Configuration configuration = ConfigFactory.create(ConfigFactory.TYPE.PRODUCTION);
         context.put(AccountService.class, new AccountServiceImpl(configuration));
+        contextHandler.addServlet(new ServletHolder(new WebSocketGameServlet()), "/game");
 
         final ResourceConfig config = new ResourceConfig(Users.class, Session.class);
         config.register(new AbstractBinder() {
