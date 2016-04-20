@@ -1,7 +1,5 @@
 package services;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.xml.internal.ws.client.sei.ResponseBuilder;
 import models.UserLoginRequest;
 import models.UserProfile;
 import org.hibernate.HibernateException;
@@ -12,6 +10,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.hibernate.service.ServiceRegistry;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import services.dao.UserProfileDAO;
 

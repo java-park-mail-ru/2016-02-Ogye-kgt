@@ -12,13 +12,10 @@ import rest.Session;
 import rest.Users;
 import services.AccountService;
 import services.AccountServiceImpl;
-import services.WebSocketService;
-import services.WebSocketServiceImpl;
 import services.config.ConfigFactory;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Properties;
 
 
