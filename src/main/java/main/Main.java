@@ -20,9 +20,10 @@ import java.util.Properties;
 
 
 public class Main {
+    public static final int DEFAULT_PORT = 8089;
     @SuppressWarnings("OverlyBroadThrowsClause")
     public static void main(String[] args) throws Exception {
-        int port = -1;
+        int port = DEFAULT_PORT;
         String host = "localhost";
         // Читаем параметры.
         try (final FileInputStream fis = new FileInputStream("config/server.properties")) {
