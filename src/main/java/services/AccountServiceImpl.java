@@ -186,11 +186,8 @@ public class AccountServiceImpl implements AccountService {
         addSession(sessionId, userProfile);
         //noinspection UnnecessaryLocalVariable
         final boolean isPasswordEqual = userProfile.getPassword().equals(user.getPassword());
-        if (isPasswordEqual) {
-            return userProfile;
-        } else {
-            return null;
-        }
+        return isPasswordEqual ? userProfile : null;
+
     }
 
     @Override

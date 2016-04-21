@@ -2,6 +2,7 @@ package main;
 
 import mechanics.WebSocketGameServlet;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -21,10 +22,12 @@ import java.util.Properties;
 
 public class Main {
     public static final int DEFAULT_PORT = 8089;
+    public static final String DEFAULT_HOST = "127.0.0.1";
+
     @SuppressWarnings("OverlyBroadThrowsClause")
     public static void main(String[] args) throws Exception {
         int port = DEFAULT_PORT;
-        String host = "localhost";
+        String host = DEFAULT_HOST;
         // Читаем параметры.
         try (final FileInputStream fis = new FileInputStream("config/server.properties")) {
             final Properties properties = new Properties();
@@ -39,9 +42,15 @@ public class Main {
         }
 
 
-        System.out.append("Starting at port: ").append(String.valueOf(port)).append('\n');
+//        System.out.append("Starting at port: ").append(String.valueOf(port)).append('\n');
 
-        final Server server = new Server(port);
+        final Server server = new Server();
+        final ServerConnector connector = new ServerConnector(server);
+        connector.setHost(host);
+        connector.setPort(port);
+
+        server.addConnector(connector);
+
         final ServletContextHandler contextHandler = new ServletContextHandler(server, "/api/", ServletContextHandler.SESSIONS);
 
         final Context context = new Context();

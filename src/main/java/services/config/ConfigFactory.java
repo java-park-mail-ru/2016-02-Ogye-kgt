@@ -6,8 +6,6 @@ import org.hibernate.cfg.Configuration;
 public class ConfigFactory {
     public enum TYPE {DEBUG, PRODUCTION}
 
-    ;
-
     public static Configuration create(TYPE type) {
         Configuration configuration = new Configuration();
         configuration = configuration.addAnnotatedClass(UserProfile.class);

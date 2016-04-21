@@ -61,6 +61,11 @@ public class Session {
             return Response.status(Response.Status.OK).entity(result).build();
         } catch (AccountServiceImpl.DatabaseException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } catch (NullPointerException e) {
+            final JsonObject result = Json.createObjectBuilder()
+                    .add("message", "Invalid login.")
+                    .build();
+            return Response.status(Response.Status.FORBIDDEN).entity(result).build();
         }
     }
 
