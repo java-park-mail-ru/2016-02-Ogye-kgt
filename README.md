@@ -1,5 +1,5 @@
 # x03d (Java Backend)
-3D Tic-Tac-Toe with multiplayer.
+3D Tic-Tac-Toe game with multiplayer.
 ## Build
 `mvn clean package`
 ## Configure
