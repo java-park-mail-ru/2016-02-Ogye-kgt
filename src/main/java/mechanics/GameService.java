@@ -4,9 +4,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Created by gantz on 19.04.16.
- */
+
 public class GameService {
     private Set<GameWebSocket> webSockets;
 

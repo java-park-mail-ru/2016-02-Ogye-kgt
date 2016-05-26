@@ -1,6 +1,8 @@
 package main;
 
+import mechanics.GameMechanics;
 import mechanics.WebSocketGameServlet;
+import mechanics.WebSocketService;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -54,9 +56,15 @@ public class Main {
         final ServletContextHandler contextHandler = new ServletContextHandler(server, "/api/", ServletContextHandler.SESSIONS);
 
         final Context context = new Context();
+
+        final WebSocketService webSocketService = new WebSocketService();
+        final GameMechanics gameMechanics = new GameMechanics(webSocketService);
+        // AccoutntService.
         final Configuration configuration = ConfigFactory.create(ConfigFactory.TYPE.PRODUCTION);
-        context.put(AccountService.class, new AccountServiceImpl(configuration));
-        contextHandler.addServlet(new ServletHolder(new WebSocketGameServlet()), "/game");
+        final AccountService accountService = new AccountServiceImpl(configuration);
+        context.put(AccountService.class, accountService);
+
+        contextHandler.addServlet(new ServletHolder(new WebSocketGameServlet(accountService, gameMechanics, webSocketService)), "/game");
 
         final ResourceConfig config = new ResourceConfig(Users.class, Session.class);
         config.register(new AbstractBinder() {
