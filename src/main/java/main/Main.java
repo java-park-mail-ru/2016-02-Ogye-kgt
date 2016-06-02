@@ -3,6 +3,8 @@ package main;
 import mechanics.GameMechanics;
 import mechanics.WebSocketGameServlet;
 import mechanics.WebSocketService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -23,8 +25,11 @@ import java.util.Properties;
 
 
 public class Main {
+
+    private static final Logger LOGGER = LogManager.getLogger(Main.class);
     public static final int DEFAULT_PORT = 8089;
     public static final String DEFAULT_HOST = "127.0.0.1";
+
 
     @SuppressWarnings("OverlyBroadThrowsClause")
     public static void main(String[] args) throws Exception {
@@ -53,7 +58,7 @@ public class Main {
 
         server.addConnector(connector);
 
-        final ServletContextHandler contextHandler = new ServletContextHandler(server, "/api/", ServletContextHandler.SESSIONS);
+        final ServletContextHandler contextHandler = new ServletContextHandler(server, "/api", ServletContextHandler.SESSIONS);
 
         final Context context = new Context();
 
@@ -78,6 +83,9 @@ public class Main {
         servletHolder.setInitParameter("javax.ws.rs.Application", "main.RestApplication");
 
         contextHandler.addServlet(servletHolder, "/*");
+
+        LOGGER.info("Server started at: " + host + port);
+
         server.start();
         server.join();
     }
