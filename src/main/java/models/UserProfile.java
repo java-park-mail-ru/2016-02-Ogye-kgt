@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 @Table(name = "UserProfile")
 public class UserProfile {
     private static final int MIN_LOGIN_LENGTH = 3;
-    private static final int MIN_PASS_LENGTH = 5;
+    private static final int MIN_PASS_LENGTH = 4;
     private static final String EMAIL_REGEXP = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*"
             + "@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
     @NotNull
@@ -21,9 +21,6 @@ public class UserProfile {
     private String login;
     @NotNull
     private String password;
-    @NotNull
-    @Column(unique = true)
-    private String email;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -32,10 +29,9 @@ public class UserProfile {
     public UserProfile() {
     }
 
-    public UserProfile(@NotNull String login, @NotNull String password, @NotNull String email) {
+    public UserProfile(@NotNull String login, @NotNull String password) {
         this.login = login;
         this.password = password;
-        this.email = email;
         setId();
     }
 
@@ -57,16 +53,6 @@ public class UserProfile {
     public void setPassword(@NotNull String password) {
         if (isPasswordValid(password))
             this.password = password;
-    }
-
-    @NotNull
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(@NotNull String email) {
-        if (isEmailValid(email))
-            this.email = email;
     }
 
     public long getId() {
@@ -95,9 +81,8 @@ public class UserProfile {
     }
 
     public boolean isValid() {
-        return isLoginValid(login) && isEmailValid(email) && isPasswordValid(password);
+        return isLoginValid(login) && isPasswordValid(password);
     }
-
 
 
     @Override
@@ -109,15 +94,13 @@ public class UserProfile {
 
         if (!login.equals(that.login)) return false;
         if (!password.equals(that.password)) return false;
-        return email.equals(that.email);
-
+        return true;
     }
 
     @Override
     public int hashCode() {
         int result = login.hashCode();
         result = 31 * result + password.hashCode();
-        result = 31 * result + email.hashCode();
         return result;
     }
 }

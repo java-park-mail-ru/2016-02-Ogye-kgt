@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 
 
 public class RestTest extends JerseyTest {
-    public static final UserProfile testUser = new UserProfile("testlogin", "qwerty", "test@mail.ru");
+    public static final UserProfile testUser = new UserProfile("testlogin", "qwerty");
     public static final UserLoginRequest userLoginRequest = new UserLoginRequest(testUser.getLogin(), testUser.getPassword());
     public static final Entity<UserProfile> userEntity = Entity.entity(testUser, MediaType.APPLICATION_JSON_TYPE);
     public static final int STATUS_NOT_FOUND = 404;
@@ -88,7 +88,6 @@ public class RestTest extends JerseyTest {
         final UserProfile createdUser = getUserResponse.readEntity(UserProfile.class);
 
         assertEquals(testUser.getLogin(), createdUser.getLogin());
-        assertEquals(testUser.getEmail(), createdUser.getEmail());
     }
 
 

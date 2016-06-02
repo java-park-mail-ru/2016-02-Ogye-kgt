@@ -3,9 +3,7 @@ package rest;
 import models.UserProfile;
 import org.glassfish.jersey.message.internal.MessageBodyProviderNotFoundException;
 import org.junit.Test;
-import services.AccountServiceImplTest;
 
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -22,7 +20,7 @@ public class UsersTest extends RestTest {
 
     @Test
     public void testCreateInvalidUser() throws Exception {
-        final Response resp = addUserRequest(new UserProfile("a", "b", "c"));
+        final Response resp = addUserRequest(new UserProfile("a", "b"));
         assertEquals(STATUS_FORBIDDEN, resp.getStatus());
     }
 
@@ -61,19 +59,18 @@ public class UsersTest extends RestTest {
     public void updateUser() throws Exception {
         final long id = addUser(testUser);
         login(testUser);
-        final UserProfile newProfile = new UserProfile("newLogin", "newPassword", "new@mail.ru");
+        final UserProfile newProfile = new UserProfile("newLogin", "newPassword");
         final Entity<UserProfile> newProfileEntity = Entity.entity(newProfile, MediaType.APPLICATION_JSON_TYPE);
         final Response resp = target("user").path(Long.toString(id)).request().put(newProfileEntity);
         assertEquals(STATUS_OK, resp.getStatus());
         final UserProfile updatedProfile = getUser(id);
-        assertEquals(newProfile.getEmail(), updatedProfile.getEmail());
         assertEquals(newProfile.getLogin(), updatedProfile.getLogin());
     }
 
     @Test
     public void updateUserForbidden() throws Exception {
         final long id = addUser(testUser);
-        final UserProfile newProfile = new UserProfile("newLogin", "newPassword", "new@mail.ru");
+        final UserProfile newProfile = new UserProfile("newLogin", "newPassword");
         final Entity<UserProfile> newProfileEntity = Entity.entity(newProfile, MediaType.APPLICATION_JSON_TYPE);
         final Response resp = target("user").path(Long.toString(id)).request().put(newProfileEntity);
         assertEquals(STATUS_FORBIDDEN, resp.getStatus());

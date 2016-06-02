@@ -142,11 +142,9 @@ public class AccountServiceImpl implements AccountService {
 
         if (!UserProfile.isLoginValid(newProfile.getLogin())) return false;
         if (!UserProfile.isPasswordValid(newProfile.getPassword())) return false;
-        if (!UserProfile.isEmailValid(newProfile.getEmail())) return false;
 
         userProfile.setLogin(newProfile.getLogin());
         userProfile.setPassword(newProfile.getPassword());
-        userProfile.setEmail(newProfile.getEmail());
         try (Session session = sessionFactory.openSession()) {
             final Transaction transaction = session.beginTransaction();
             final UserProfileDAO dao = new UserProfileDAO(session);

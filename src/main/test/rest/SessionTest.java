@@ -56,7 +56,7 @@ public class SessionTest extends RestTest {
 
     @Test
     public void testLoginFail() throws Exception {
-        final Response resp = login(new UserProfile("test1", "onetwothree", "sample1@mail.ru"));
+        final Response resp = login(new UserProfile("test1", "onetwothree"));
         assertEquals(STATUS_NOT_FOUND, resp.getStatus());
     }
 

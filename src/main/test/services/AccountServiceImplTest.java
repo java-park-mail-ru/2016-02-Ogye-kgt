@@ -5,7 +5,6 @@ import models.UserProfile;
 import org.hibernate.cfg.Configuration;
 import org.junit.Before;
 import org.junit.Test;
-import services.AccountServiceImpl.InvalidUserException;
 import services.AccountServiceImpl.DatabaseException;
 import services.config.ConfigFactory;
 
@@ -24,7 +23,7 @@ public class AccountServiceImplTest {
     public void setUp() throws Exception {
         final Configuration config = ConfigFactory.create(ConfigFactory.TYPE.DEBUG);
         accountService = new AccountServiceImpl(config);
-        testUser = new UserProfile(TEST_LOGIN, TEST_PASS, "test@mail.ru");
+        testUser = new UserProfile(TEST_LOGIN, TEST_PASS);
         testLoginRequest = new UserLoginRequest(TEST_LOGIN, TEST_PASS);
     }
 
@@ -42,7 +41,7 @@ public class AccountServiceImplTest {
     @Test(expected = DatabaseException.class)
     public void testAddSameLoginFail() throws Exception {
         accountService.addUser(testUser);
-        accountService.addUser(new UserProfile(testUser.getLogin(), "password", "another@mail.ru"));
+        accountService.addUser(new UserProfile(testUser.getLogin(), "password"));
     }
 
     @Test
@@ -81,7 +80,7 @@ public class AccountServiceImplTest {
     public void testUpdateUser() throws Exception {
         final long userId = accountService.addUser(testUser);
         accountService.doLogin(TEST_SESSION_ID, testLoginRequest);
-        final UserProfile newProfile = new UserProfile("newLogin", "testpass", "test@mail.ru");
+        final UserProfile newProfile = new UserProfile("newLogin", "testpass");
         final boolean result = accountService.updateUser(TEST_SESSION_ID, userId, newProfile);
         assertTrue(result);
         final UserProfile updatedUser = accountService.getUser(userId);
@@ -93,7 +92,7 @@ public class AccountServiceImplTest {
         accountService.addUser(testUser);
         accountService.doLogin(TEST_SESSION_ID, testLoginRequest);
         final long wrongId = testUser.getId() + 1;
-        final UserProfile newUser = new UserProfile("newLogin", "testpass", "test@mail.ru");
+        final UserProfile newUser = new UserProfile("newLogin", "testpass");
         final boolean result = accountService.updateUser(TEST_SESSION_ID, wrongId, newUser);
         assertFalse(result);
     }
@@ -102,19 +101,11 @@ public class AccountServiceImplTest {
     public void testUpdateUserInvalidSessionFail() throws Exception {
         accountService.addUser(testUser);
         accountService.doLogin(TEST_SESSION_ID, testLoginRequest);
-        final UserProfile newUser = new UserProfile("newLogin", "testpass", "test@mail.ru");
+        final UserProfile newUser = new UserProfile("newLogin", "testpass");
         final boolean result = accountService.updateUser(INVALID_SESSION_ID, testUser.getId(), newUser);
         assertFalse(result);
     }
 
-    @Test
-    public void testUpdateUserInvalidEmailFail() throws Exception {
-        accountService.addUser(testUser);
-        accountService.doLogin(TEST_SESSION_ID, new UserLoginRequest("testlogin", "testpass"));
-        final UserProfile newUser = new UserProfile("newLogin", "testpass", "invalidmail.ru");
-        final boolean result = accountService.updateUser(TEST_SESSION_ID, testUser.getId(), newUser);
-        assertFalse(result);
-    }
 
     @Test
     public void testDoLogin() throws Exception {

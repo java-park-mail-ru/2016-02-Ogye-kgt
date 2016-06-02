@@ -76,7 +76,6 @@ public class Users {
             final JsonObject result = Json.createObjectBuilder()
                     .add("id", id)
                     .add("login", user.getLogin())
-                    .add("email", user.getEmail())
                     .build();
             return Response.status(Response.Status.OK).entity(result).build();
         } catch (DatabaseException e) {

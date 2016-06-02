@@ -21,8 +21,8 @@ public class UserProfileTest {
 
     @Test
     public void testIsPasswordValid() throws Exception {
-        final String[] validPasswords = {"12345", "qwerty", "qwerty1234"};
-        final String[] invalidPasswords = {null, "", "1", "12", "123", "1234"};
+        final String[] validPasswords = {"1234", "12345", "qwerty", "qwerty1234"};
+        final String[] invalidPasswords = {null, "", "1", "12", "123"};
         for (String password : validPasswords)
             assertTrue("Valid password validation fault", isPasswordValid(password));
         for (String password : invalidPasswords)
@@ -41,13 +41,12 @@ public class UserProfileTest {
 
     @Test
     public void equals() throws Exception {
-        final UserProfile up1 = new UserProfile("login", "qwerty", "exampl@mail.ru");
-        final UserProfile up2 = new UserProfile("login", "qwerty", "exampl@mail.ru");
-        final UserProfile up3 = new UserProfile("login", "qwerty", "enother@mail.ru");
-        final UserProfile up4 = new UserProfile("login", "123456", "enother@mail.ru");
-        final UserProfile up5 = new UserProfile("other", "qwerty", "enother@mail.ru");
+        final UserProfile up1 = new UserProfile("login", "qwerty");
+        final UserProfile up2 = new UserProfile("login", "qwerty");
+        final UserProfile up3 = new UserProfile("login", "qwerty");
+        final UserProfile up4 = new UserProfile("login", "123456");
+        final UserProfile up5 = new UserProfile("other", "qwerty");
         assertEquals(up1, up2);
-        assertNotEquals(up2, up3);
         assertNotEquals(up3, up4);
         assertNotEquals(up4, up5);
     }
