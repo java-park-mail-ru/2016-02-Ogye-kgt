@@ -39,6 +39,7 @@ public class GameMechanics {
             waiter = null;
         } else {
             waiter = user;
+            System.out.println("Waiter: " + user);
             webSocketService.notifyStartWaiting(user);
         }
     }

@@ -11,6 +11,7 @@ import javax.inject.Singleton;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Null;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -70,7 +71,6 @@ public class Users {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserById(@PathParam("id") long id) {
         final AccountService accountService = context.get(AccountService.class);
-        // todo: checkAuth;
         try {
             final UserProfile user = accountService.getUser(id);
             final JsonObject result = Json.createObjectBuilder()
@@ -78,8 +78,8 @@ public class Users {
                     .add("login", user.getLogin())
                     .build();
             return Response.status(Response.Status.OK).entity(result).build();
-        } catch (DatabaseException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } catch (DatabaseException | NullPointerException e) {
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
 

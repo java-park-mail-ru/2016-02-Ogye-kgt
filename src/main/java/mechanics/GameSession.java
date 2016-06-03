@@ -19,11 +19,14 @@ public class GameSession {
     private Map<String, GameUser> users = new HashMap<>();
 
     public GameSession(@NotNull String user1, @NotNull String user2) {
+        System.out.println("user1: " + user1 + " user2: " + user2);
         final GameUser gameUser1 = new GameUser(user1);
-        firstUser.setEnemyName(user2);
+        gameUser1.setEnemyName(user2);
+        firstUser = gameUser1;
 
         final GameUser gameUser2 = new GameUser(user2);
         gameUser2.setEnemyName(user1);
+        secondUser = gameUser2;
 
         users.put(user1, gameUser1);
         users.put(user2, gameUser2);

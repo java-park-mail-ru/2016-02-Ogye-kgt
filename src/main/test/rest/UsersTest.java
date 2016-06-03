@@ -46,13 +46,14 @@ public class UsersTest extends RestTest {
         assertEquals(STATUS_FORBIDDEN, response.getStatus());
     }
 
-    @Test(expected = MessageBodyProviderNotFoundException.class)
+    @Test()
     public void deleteUser() throws Exception {
         final long id = addUser(testUser);
         login(testUser);
         final Response resp = target("user").path(Long.toString(id)).request().delete();
         assertEquals(STATUS_OK, resp.getStatus());
-        getUser(id);
+        final Response resp2 = target("user").path(Long.toString(id)).request().get();
+        assertEquals(STATUS_NOT_FOUND, resp2.getStatus());
     }
 
     @Test

@@ -2,6 +2,7 @@ package services;
 
 import models.UserLoginRequest;
 import models.UserProfile;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -24,6 +25,7 @@ public interface AccountService {
 
     boolean isAuthorised(String sessionId);
 
+    @Nullable
     UserProfile getUserBySession(String sessionId);
 
     UserProfile doLogin(String sessionId, UserLoginRequest userLoginRequest) throws AccountServiceImpl.DatabaseException;
