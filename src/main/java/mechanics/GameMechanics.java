@@ -37,7 +37,7 @@ public class GameMechanics {
     }
 
     private void addUserInternal(@NotNull String user) {
-        if (waiter != null) {
+        if (waiter != null && !waiter.equals(user)) {
             //noinspection ConstantConditions
             startGame(user, waiter);
             waiter = null;
@@ -59,6 +59,11 @@ public class GameMechanics {
         if (myGameSession.isWinner(userName, item.position)) {
             webSocketService.notifyGameOver(myUser.getMyName(), myUser.getEnemyName());
             webSocketService.notifyGameOver(myUser.getEnemyName(), myUser.getEnemyName());
+            return;
+        }
+        if (myGameSession.isFieldFull()) {
+            webSocketService.notifyGameOver(myUser.getMyName(), null);
+            webSocketService.notifyGameOver(myUser.getEnemyName(), null);
         }
     }
 

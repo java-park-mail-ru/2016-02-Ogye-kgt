@@ -55,6 +55,10 @@ public class GameSession {
         return field.isWinner(pos, users.get(user).getId());
     }
 
+    public boolean isFieldFull() {
+        return field.isFull();
+    }
+
     public boolean addNewItem(Item item) {
         if (field.put(item.position, currentUser.getId())) {
             changeCurrentUser();

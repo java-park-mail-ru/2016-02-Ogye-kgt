@@ -2,6 +2,7 @@ package mechanics;
 
 import mechanics.models.Item;
 import models.GameUser;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class WebSocketService {
         gameWebSocket.newItem(item);
     }
 
-    public void notifyGameOver(String user, String winner) {
+    public void notifyGameOver(String user, @Nullable String winner) {
         userSockets.get(user).gameOver(winner);
     }
 }

@@ -4,6 +4,7 @@ package mechanics.models;
 public class GameField {
     static final int SIZE = 4;
     static final int VOLUME = SIZE * SIZE * SIZE;
+    private int freeCells = VOLUME;
 
     private int[][][] field = new int[SIZE][SIZE][SIZE];
 
@@ -14,10 +15,15 @@ public class GameField {
     public boolean put(Position pos, int value) {
         if (isEmpty(pos) && isValid(pos)) {
             field[pos.x][pos.y][pos.z] = value;
+            freeCells--;
             return true;
         } else {
             return false;
         }
+    }
+
+    public boolean isFull() {
+        return freeCells == 0;
     }
 
     public boolean isEmpty(Position pos) {
