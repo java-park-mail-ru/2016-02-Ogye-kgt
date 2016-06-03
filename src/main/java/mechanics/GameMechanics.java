@@ -52,6 +52,8 @@ public class GameMechanics {
         final GameSession myGameSession = nameToGame.get(userName);
         final GameUser myUser = myGameSession.getSelf(userName);
         final GameUser enemyUser = myGameSession.getEnemy(userName);
+        if (!myGameSession.checkUser(userName)) return;
+        if (!myGameSession.addNewItem(item)) return;
         webSocketService.notifyNewItem(myUser.getMyName(), item);
         webSocketService.notifyNewItem(enemyUser.getMyName(), item);
     }
