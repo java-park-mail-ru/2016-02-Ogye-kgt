@@ -28,7 +28,7 @@ public class WebSocketService {
         gameWebSocket.newItem(item);
     }
 
-    public void notifyGameOver(GameUser user, boolean win) {
-        userSockets.get(user.getMyName()).gameOver(win);
+    public void notifyGameOver(String user, String winner) {
+        userSockets.get(user).gameOver(winner);
     }
 }

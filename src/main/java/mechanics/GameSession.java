@@ -2,6 +2,7 @@ package mechanics;
 
 import mechanics.models.GameField;
 import mechanics.models.Item;
+import mechanics.models.Position;
 import models.GameUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,8 +47,12 @@ public class GameSession {
         }
     }
 
-    public boolean checkUser(String user) {
+    public boolean isCurrent(String user) {
         return currentUser.getMyName().equals(user);
+    }
+
+    public boolean isWinner(String user, Position pos) {
+        return field.isWinner(pos, users.get(user).getId());
     }
 
     public boolean addNewItem(Item item) {

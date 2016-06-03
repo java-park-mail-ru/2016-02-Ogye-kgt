@@ -105,11 +105,11 @@ public class GameWebSocket {
         }
     }
 
-    public void gameOver(boolean win) {
+    public void gameOver(String winner) {
         try {
             final JsonObject jsonEndGame = new JsonObject();
             jsonEndGame.addProperty("status", "finish");
-            jsonEndGame.addProperty("win", win);
+            jsonEndGame.addProperty("win", winner);
             if (session != null && session.isOpen())
                 //noinspection ConstantConditions
                 session.getRemote().sendString(jsonEndGame.toString());
