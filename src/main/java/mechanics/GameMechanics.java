@@ -28,7 +28,8 @@ public class GameMechanics {
     }
 
     public void addUser(@NotNull String user) {
-        tasks.add(()->addUserInternal(user));
+//        tasks.add(()->addUserInternal(user));
+        addUserInternal(user);
     }
 
     private void addUserInternal(@NotNull String user) {

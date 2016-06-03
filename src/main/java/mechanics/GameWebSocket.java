@@ -1,7 +1,10 @@
 package mechanics;
 
 import com.google.gson.JsonObject;
+import main.Main;
 import models.GameUser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.websocket.api.WebSocketException;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -16,6 +19,7 @@ import java.io.IOException;
 
 @WebSocket
 public class GameWebSocket {
+    private static final Logger LOGGER = LogManager.getLogger(Main.class);
     @NotNull
     private String myName;
     @Nullable
@@ -25,9 +29,6 @@ public class GameWebSocket {
     @NotNull
     private WebSocketService webSocketService;
 
- /*   public GameWebSocket(@NotNull GameService gameService) {
-        this.gameService = gameService;
-    }*/
 
     public GameWebSocket(@NotNull String myName, @NotNull GameMechanics gameMechanics, @NotNull WebSocketService webSocketService) {
         this.myName = myName;
@@ -45,7 +46,16 @@ public class GameWebSocket {
 
     @OnWebSocketMessage
     public void onMessage(String data) {
-//        gameService.sendMessage(data);
+        try {
+            final JsonObject jsonStart = new JsonObject();
+            jsonStart.addProperty("status", "newItem");
+            jsonStart.addProperty("body", data);
+            if (session != null && session.isOpen())
+                //noinspection ConstantConditions
+                session.getRemote().sendString(jsonStart.toString());
+        } catch (IOException | WebSocketException e) {
+            LOGGER.error("Can't send web socket", e);
+        }
     }
 
     @OnWebSocketClose
@@ -62,7 +72,7 @@ public class GameWebSocket {
                 //noinspection ConstantConditions
                 session.getRemote().sendString(jsonStart.toString());
         } catch (IOException | WebSocketException e) {
-//            LOGGER.error("Can't send web socket", e);
+            LOGGER.error("Can't send web socket", e);
         }
     }
 
@@ -77,12 +87,12 @@ public class GameWebSocket {
     public void waitForSession() {
         try {
             final JsonObject jsonEndGame = new JsonObject();
-            jsonEndGame.addProperty("status", "waiting for enemy");
+            jsonEndGame.addProperty("status", "waiting");
             if (session != null && session.isOpen())
                 //noinspection ConstantConditions
                 session.getRemote().sendString(jsonEndGame.toString());
         } catch (IOException | WebSocketException e) {
-            // ...
+            LOGGER.error("Can't send web socket", e);
         }
     }
 
@@ -95,7 +105,7 @@ public class GameWebSocket {
                 //noinspection ConstantConditions
                 session.getRemote().sendString(jsonEndGame.toString());
         } catch (IOException | WebSocketException e) {
-            // ...
+            LOGGER.error("Can't send web socket", e);
         }
     }
 
