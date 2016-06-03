@@ -1,7 +1,10 @@
 package mechanics;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import main.Main;
+import mechanics.models.Item;
+import mechanics.models.Position;
 import models.GameUser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,6 +17,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.json.Json;
 import java.io.IOException;
 
 
@@ -46,21 +50,15 @@ public class GameWebSocket {
 
     @OnWebSocketMessage
     public void onMessage(String data) {
-        try {
-            final JsonObject jsonStart = new JsonObject();
-            jsonStart.addProperty("status", "newItem");
-            jsonStart.addProperty("body", data);
-            if (session != null && session.isOpen())
-                //noinspection ConstantConditions
-                session.getRemote().sendString(jsonStart.toString());
-        } catch (IOException | WebSocketException e) {
-            LOGGER.error("Can't send web socket", e);
-        }
+        final Gson gson = new Gson();
+        final Position position = gson.fromJson(data, Position.class);
+        final Item item = new Item(position, myName);
+        gameMechanics.addNewItem(myName, item);
     }
 
     @OnWebSocketClose
     public void onClose(int statusCode, String reason) {
-//        gameService.remove(this);
+        // ...
     }
 
     public void startGame(@NotNull GameUser user) {
@@ -76,21 +74,32 @@ public class GameWebSocket {
         }
     }
 
-    public void sendString(String data) {
+
+    public void newItem(Item item) {
         try {
-            session.getRemote().sendString(data);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+            final JsonObject jsonNewItem = new JsonObject();
+            final JsonObject jsonItem = new JsonObject();
+            jsonItem.addProperty("x", item.position.x);
+            jsonItem.addProperty("y", item.position.y);
+            jsonItem.addProperty("z", item.position.z);
+
+            jsonNewItem.addProperty("status", "newItem");
+            jsonNewItem.add("body", jsonItem);
+            if (session != null && session.isOpen())
+                //noinspection ConstantConditions
+                session.getRemote().sendString(jsonNewItem.toString());
+        } catch (IOException | WebSocketException e) {
+            LOGGER.error("Can't send web socket", e);
         }
     }
 
     public void waitForSession() {
         try {
-            final JsonObject jsonEndGame = new JsonObject();
-            jsonEndGame.addProperty("status", "waiting");
+            final JsonObject jsonWaiting = new JsonObject();
+            jsonWaiting.addProperty("status", "waiting");
             if (session != null && session.isOpen())
                 //noinspection ConstantConditions
-                session.getRemote().sendString(jsonEndGame.toString());
+                session.getRemote().sendString(jsonWaiting.toString());
         } catch (IOException | WebSocketException e) {
             LOGGER.error("Can't send web socket", e);
         }

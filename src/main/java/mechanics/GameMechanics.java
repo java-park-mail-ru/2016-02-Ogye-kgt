@@ -1,6 +1,9 @@
 package mechanics;
 
+import mechanics.models.Item;
 import models.GameUser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,6 +11,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class GameMechanics {
+    static final Logger LOGGER = LogManager.getLogger(GameMechanics.class);
+
     @NotNull
     private Map<String, GameSession> nameToGame = new HashMap<>();
 
@@ -28,7 +33,6 @@ public class GameMechanics {
     }
 
     public void addUser(@NotNull String user) {
-//        tasks.add(()->addUserInternal(user));
         addUserInternal(user);
     }
 
@@ -39,25 +43,18 @@ public class GameMechanics {
             waiter = null;
         } else {
             waiter = user;
-            System.out.println("Waiter: " + user);
             webSocketService.notifyStartWaiting(user);
         }
     }
 
-    public void incrementScore(@NotNull String userName) {
-        tasks.add(() -> incrementScoreInternal(userName));
-    }
 
-    private void incrementScoreInternal(String userName) {
-        /*GameSession myGameSession = nameToGame.get(userName);
-        GameUser myUser = myGameSession.getSelf(userName);
-        myUser.incrementMyScore();
-        GameUser enemyUser = myGameSession.getEnemy(userName);
-        enemyUser.incrementEnemyScore();
-        webSocketService.notifyMyNewScore(myUser);
-        webSocketService.notifyEnemyNewScore(enemyUser);*/
+    public void addNewItem(@NotNull String userName, @NotNull Item item) {
+        final GameSession myGameSession = nameToGame.get(userName);
+        final GameUser myUser = myGameSession.getSelf(userName);
+        final GameUser enemyUser = myGameSession.getEnemy(userName);
+        webSocketService.notifyNewItem(myUser.getMyName(), item);
+        webSocketService.notifyNewItem(enemyUser.getMyName(), item);
     }
-
 
 
     private void startGame(@NotNull String first, @NotNull String second) {

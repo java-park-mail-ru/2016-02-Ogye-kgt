@@ -1,5 +1,6 @@
 package mechanics;
 
+import mechanics.models.Item;
 import models.GameUser;
 
 import java.util.HashMap;
@@ -20,6 +21,11 @@ public class WebSocketService {
     public void notifyStartWaiting(String user) {
         final GameWebSocket gameWebSocket = userSockets.get(user);
         gameWebSocket.waitForSession();
+    }
+
+    public void notifyNewItem(String user, Item item) {
+        final GameWebSocket gameWebSocket = userSockets.get(user);
+        gameWebSocket.newItem(item);
     }
 
     public void notifyGameOver(GameUser user, boolean win) {

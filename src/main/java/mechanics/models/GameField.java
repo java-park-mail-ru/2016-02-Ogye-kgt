@@ -1,4 +1,4 @@
-package mechanics;
+package mechanics.models;
 
 
 public class GameField {
