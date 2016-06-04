@@ -57,8 +57,8 @@ public class GameMechanics {
         webSocketService.notifyNewItem(myUser.getMyName(), item);
         webSocketService.notifyNewItem(enemyUser.getMyName(), item);
         if (myGameSession.isWinner(userName, item.position)) {
-            webSocketService.notifyGameOver(myUser.getMyName(), myUser.getEnemyName());
-            webSocketService.notifyGameOver(myUser.getEnemyName(), myUser.getEnemyName());
+            webSocketService.notifyGameOver(myUser.getMyName(), myUser.getMyName());
+            webSocketService.notifyGameOver(myUser.getEnemyName(), myUser.getMyName());
             return;
         }
         if (myGameSession.isFieldFull()) {
