@@ -1,0 +1,8 @@
+CREATE DATABASE IF NOT EXISTS tp_app
+  DEFAULT CHARACTER SET utf8
+  DEFAULT COLLATE utf8_general_ci;
+CREATE DATABASE IF NOT EXISTS tp_app_debug
+  DEFAULT CHARACTER SET utf8
+  DEFAULT COLLATE utf8_general_ci;
+GRANT ALL PRIVILEGES ON `tp_app%`.* TO 'ogye'@'localhost'
+IDENTIFIED BY 'ogye_kgt';

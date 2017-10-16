@@ -1,8 +1,12 @@
 package rest;
 
 import models.UserLoginRequest;
+import models.UserProfile;
 import services.AccountService;
+import services.AccountServiceImpl;
 
+import javax.accessibility.AccessibleAction;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -11,20 +15,20 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.crypto.Data;
 
 
 @Singleton
 @Path("/session")
 public class Session {
-    private AccountService accountService;
+    @Inject
+    private main.Context context;
 
-    public Session(AccountService accountService) {
-        this.accountService = accountService;
-    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response checkAuth(@Context HttpServletRequest request) {
+        final AccountService accountService = context.get(AccountService.class);
         final String sessionId = request.getSession().getId();
         JsonObject result = Json.createObjectBuilder().build();
         if (accountService.isAuthorised(sessionId)) {
@@ -40,22 +44,35 @@ public class Session {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response userLogin(UserLoginRequest userLoginRequest, @Context HttpServletRequest request) {
-        JsonObject result = Json.createObjectBuilder().build();
+        final AccountService accountService = context.get(AccountService.class);
         final String sessionId = request.getSession().getId();
-        if (accountService.doLogin(sessionId, userLoginRequest)) {
-            //noinspection ConstantConditions
-            final long userId = accountService.getUserByLogin(userLoginRequest.getLogin()).getId();
-            result = Json.createObjectBuilder()
-                    .add("id", userId)
+        // Check user exist.
+        try {
+            accountService.getUserByLogin(userLoginRequest.getLogin());
+        } catch (AccountServiceImpl.DatabaseException e) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        try {
+            final UserProfile userProfile = accountService.doLogin(sessionId, userLoginRequest);
+            final JsonObject result = Json.createObjectBuilder()
+                    .add("id", userProfile.getId())
                     .build();
             return Response.status(Response.Status.OK).entity(result).build();
+        } catch (AccountServiceImpl.DatabaseException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } catch (NullPointerException e) {
+            final JsonObject result = Json.createObjectBuilder()
+                    .add("message", "Invalid login.")
+                    .build();
+            return Response.status(Response.Status.FORBIDDEN).entity(result).build();
         }
-        return Response.status(Response.Status.NOT_FOUND).entity(result).build();
     }
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     public Response userLogout(@Context HttpServletRequest request) {
+        final AccountService accountService = context.get(AccountService.class);
         final String sessionId = request.getSession().getId();
         accountService.doLogout(sessionId);
         final JsonObject result = Json.createObjectBuilder().build();

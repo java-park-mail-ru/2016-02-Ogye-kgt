@@ -13,7 +13,7 @@ public class UserLoginRequest {
         password = "";
     }
 
-    protected UserLoginRequest(@NotNull String login, @NotNull String password) {
+    public UserLoginRequest(@NotNull String login, @NotNull String password) {
         this.login = login;
         this.password = password;
     }
